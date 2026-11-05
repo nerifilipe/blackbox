@@ -1,0 +1,8 @@
+node_modules/
+.blackbox/
+dist/
+web/dist/
+playwright-report/
+test-results/
+*.log
+*.tsbuildinfo

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "The lost response",
+  "description": "The server saves the workout. The response never arrives. Is a retry safe?",
+  "rules": [
+    { "id": "lost-response", "name": "Drop the first response", "method": "POST", "path": "/workouts", "kind": "drop_response", "limit": 1, "delayMs": 0, "status": 0, "enabled": true }
+  ]
+}
