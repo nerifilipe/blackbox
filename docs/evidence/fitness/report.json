@@ -1,0 +1,777 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-11-05T17:49:28.201488+00:00",
+  "fixture": {
+    "repository": "https://github.com/nerifilipe/fitness-tracker-app.git",
+    "revision": "fbb5b76610652045da4d080175d814f07cf87134",
+    "backend": "backend",
+    "description": "Unmodified Fitness Tracker API with real PostgreSQL migrations and HTTP authentication."
+  },
+  "blackboxVersion": "Blackbox 0.3.0",
+  "pythonVersion": "3.14.3",
+  "cases": [
+    {
+      "id": "lost-response",
+      "name": "The server saved. The client never knew.",
+      "runId": "55469ec7-8fee-4890-9d28-f5a6020c3d54",
+      "attempts": [
+        {
+          "label": "Attempt 1",
+          "status": 0,
+          "outcome": "transport_error",
+          "durationMs": 156.75,
+          "appliedVersion": null,
+          "errorCode": null
+        },
+        {
+          "label": "Attempt 2",
+          "status": 200,
+          "outcome": "http_response",
+          "durationMs": 64.87,
+          "appliedVersion": 2,
+          "errorCode": null
+        }
+      ],
+      "states": [
+        {
+          "label": "Before requests",
+          "database": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "After attempt 1",
+          "database": {
+            "version": 2,
+            "notes": "lost-response change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "After attempt 2",
+          "database": {
+            "version": 2,
+            "notes": "lost-response change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "Final state",
+          "database": {
+            "version": 2,
+            "notes": "lost-response change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        }
+      ],
+      "checks": [
+        {
+          "name": "Fresh workout starts at version 1",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Fresh workout has no mutation receipts",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Exactly one version increment",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exactly one mutation receipt",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One exercise remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One set remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exercise and set IDs preserved",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "All client attempts have proxy evidence",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Acknowledged mutation was applied at version 2",
+          "actual": [
+            2
+          ],
+          "expected": [
+            2
+          ],
+          "passed": true
+        },
+        {
+          "name": "Lost response followed by successful retry",
+          "actual": [
+            0,
+            200
+          ],
+          "expected": [
+            0,
+            200
+          ],
+          "passed": true
+        },
+        {
+          "name": "First response was dropped after upstream HTTP 200",
+          "actual": [
+            [
+              0,
+              200,
+              "response_dropped"
+            ],
+            [
+              200,
+              200,
+              "forwarded"
+            ]
+          ],
+          "expected": [
+            [
+              0,
+              200,
+              "response_dropped"
+            ],
+            [
+              200,
+              200,
+              "forwarded"
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "name": "Commit exists before retry",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Retry does not change persisted data",
+          "actual": {
+            "version": 2,
+            "notes": "lost-response change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          },
+          "expected": {
+            "version": 2,
+            "notes": "lost-response change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          },
+          "passed": true
+        },
+        {
+          "name": "Original change is preserved",
+          "actual": "lost-response change",
+          "expected": "lost-response change",
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "The server saved. The client never knew.",
+        "description": "Fitness Tracker integration fixture",
+        "rules": [
+          {
+            "id": "fixture-fault",
+            "name": "The server saved. The client never knew.",
+            "method": "PUT",
+            "path": "/api/v1/workouts/a6cf9ac5-211d-4f1f-bc00-d4b469f03e7f",
+            "kind": "drop_response",
+            "limit": 1,
+            "status": 0,
+            "delayMs": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "idsPreserved": true,
+      "events": [
+        {
+          "id": 1,
+          "startedAt": "2026-11-05T17:50:07.0128437Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/a6cf9ac5-211d-4f1f-bc00-d4b469f03e7f",
+          "status": 0,
+          "upstreamStatus": 200,
+          "durationMs": 131.206,
+          "fault": "drop_response",
+          "rule": "The server saved. The client never knew.",
+          "outcome": "response_dropped",
+          "runId": "55469ec7-8fee-4890-9d28-f5a6020c3d54"
+        },
+        {
+          "id": 2,
+          "startedAt": "2026-11-05T17:50:07.3086688Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/a6cf9ac5-211d-4f1f-bc00-d4b469f03e7f",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 60.51,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "55469ec7-8fee-4890-9d28-f5a6020c3d54"
+        }
+      ],
+      "durationMs": 409.54,
+      "passed": true
+    },
+    {
+      "id": "temporary-503",
+      "name": "Two failures. One successful change.",
+      "runId": "39d7a869-5ec0-4251-b584-95d2bdd19787",
+      "attempts": [
+        {
+          "label": "Attempt 1",
+          "status": 503,
+          "outcome": "http_response",
+          "durationMs": 21.09,
+          "appliedVersion": null,
+          "errorCode": null
+        },
+        {
+          "label": "Attempt 2",
+          "status": 503,
+          "outcome": "http_response",
+          "durationMs": 60.09,
+          "appliedVersion": null,
+          "errorCode": null
+        },
+        {
+          "label": "Attempt 3",
+          "status": 200,
+          "outcome": "http_response",
+          "durationMs": 81.12,
+          "appliedVersion": 2,
+          "errorCode": null
+        }
+      ],
+      "states": [
+        {
+          "label": "Before requests",
+          "database": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "After attempt 1",
+          "database": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "After attempt 2",
+          "database": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "After attempt 3",
+          "database": {
+            "version": 2,
+            "notes": "temporary-503 change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "Final state",
+          "database": {
+            "version": 2,
+            "notes": "temporary-503 change",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        }
+      ],
+      "checks": [
+        {
+          "name": "Fresh workout starts at version 1",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Fresh workout has no mutation receipts",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Exactly one version increment",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exactly one mutation receipt",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One exercise remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One set remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exercise and set IDs preserved",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "All client attempts have proxy evidence",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "Acknowledged mutation was applied at version 2",
+          "actual": [
+            2
+          ],
+          "expected": [
+            2
+          ],
+          "passed": true
+        },
+        {
+          "name": "Two failures followed by success",
+          "actual": [
+            503,
+            503,
+            200
+          ],
+          "expected": [
+            503,
+            503,
+            200
+          ],
+          "passed": true
+        },
+        {
+          "name": "503s never contacted upstream",
+          "actual": [
+            [
+              503,
+              0,
+              "error_injected"
+            ],
+            [
+              503,
+              0,
+              "error_injected"
+            ],
+            [
+              200,
+              200,
+              "forwarded"
+            ]
+          ],
+          "expected": [
+            [
+              503,
+              0,
+              "error_injected"
+            ],
+            [
+              503,
+              0,
+              "error_injected"
+            ],
+            [
+              200,
+              200,
+              "forwarded"
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "name": "After attempt 1: database unchanged",
+          "actual": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          },
+          "expected": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          },
+          "passed": true
+        },
+        {
+          "name": "After attempt 2: database unchanged",
+          "actual": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          },
+          "expected": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          },
+          "passed": true
+        },
+        {
+          "name": "Change eventually persisted",
+          "actual": "temporary-503 change",
+          "expected": "temporary-503 change",
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "Two failures. One successful change.",
+        "description": "Fitness Tracker integration fixture",
+        "rules": [
+          {
+            "id": "fixture-fault",
+            "name": "Two failures. One successful change.",
+            "method": "PUT",
+            "path": "/api/v1/workouts/1d413a13-42f7-4cbb-8f47-9d7ac5f5ef93",
+            "kind": "http_error",
+            "limit": 2,
+            "status": 503,
+            "delayMs": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "idsPreserved": true,
+      "events": [
+        {
+          "id": 3,
+          "startedAt": "2026-11-05T17:50:07.7684995Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/1d413a13-42f7-4cbb-8f47-9d7ac5f5ef93",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 0.039,
+          "fault": "http_error",
+          "rule": "Two failures. One successful change.",
+          "outcome": "error_injected",
+          "runId": "39d7a869-5ec0-4251-b584-95d2bdd19787"
+        },
+        {
+          "id": 4,
+          "startedAt": "2026-11-05T17:50:07.9435791Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/1d413a13-42f7-4cbb-8f47-9d7ac5f5ef93",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 1.103,
+          "fault": "http_error",
+          "rule": "Two failures. One successful change.",
+          "outcome": "error_injected",
+          "runId": "39d7a869-5ec0-4251-b584-95d2bdd19787"
+        },
+        {
+          "id": 5,
+          "startedAt": "2026-11-05T17:50:08.2907328Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/1d413a13-42f7-4cbb-8f47-9d7ac5f5ef93",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 77.292,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "39d7a869-5ec0-4251-b584-95d2bdd19787"
+        }
+      ],
+      "durationMs": 666.7,
+      "passed": true
+    },
+    {
+      "id": "concurrent-edit",
+      "name": "Two devices. One accepted version.",
+      "runId": "32545602-3656-41cc-ab0a-a51a49abf421",
+      "attempts": [
+        {
+          "label": "device-A",
+          "status": 409,
+          "outcome": "http_response",
+          "durationMs": 378.29,
+          "appliedVersion": null,
+          "errorCode": "workout_conflict"
+        },
+        {
+          "label": "device-B",
+          "status": 200,
+          "outcome": "http_response",
+          "durationMs": 93.95,
+          "appliedVersion": 2,
+          "errorCode": null
+        }
+      ],
+      "states": [
+        {
+          "label": "Before requests",
+          "database": {
+            "version": 1,
+            "notes": null,
+            "mutations": 0,
+            "exercises": 1,
+            "sets": 1
+          }
+        },
+        {
+          "label": "Final state",
+          "database": {
+            "version": 2,
+            "notes": "device-B",
+            "mutations": 1,
+            "exercises": 1,
+            "sets": 1
+          }
+        }
+      ],
+      "checks": [
+        {
+          "name": "Fresh workout starts at version 1",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Fresh workout has no mutation receipts",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Exactly one version increment",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exactly one mutation receipt",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One exercise remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "One set remains",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Exercise and set IDs preserved",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "All client attempts have proxy evidence",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Acknowledged mutation was applied at version 2",
+          "actual": [
+            2
+          ],
+          "expected": [
+            2
+          ],
+          "passed": true
+        },
+        {
+          "name": "One concurrent edit accepted and one rejected",
+          "actual": [
+            200,
+            409
+          ],
+          "expected": [
+            200,
+            409
+          ],
+          "passed": true
+        },
+        {
+          "name": "Conflict is specifically a stale version",
+          "actual": [
+            "workout_conflict"
+          ],
+          "expected": [
+            "workout_conflict"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Winning edit is preserved",
+          "actual": [
+            "device-B"
+          ],
+          "expected": [
+            "device-B"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Latency was injected exactly once",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Both requests reached upstream",
+          "actual": [
+            [
+              200,
+              200
+            ],
+            [
+              409,
+              409
+            ]
+          ],
+          "expected": [
+            [
+              200,
+              200
+            ],
+            [
+              409,
+              409
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "Two devices. One accepted version.",
+        "description": "Fitness Tracker integration fixture",
+        "rules": [
+          {
+            "id": "fixture-fault",
+            "name": "Two devices. One accepted version.",
+            "method": "PUT",
+            "path": "/api/v1/workouts/fbd058df-d66b-4c35-80a4-80808d375772",
+            "kind": "latency",
+            "limit": 1,
+            "status": 0,
+            "delayMs": 300,
+            "enabled": true
+          }
+        ]
+      },
+      "idsPreserved": true,
+      "events": [
+        {
+          "id": 6,
+          "startedAt": "2026-11-05T17:50:08.8855896Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/fbd058df-d66b-4c35-80a4-80808d375772",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 69.801,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "32545602-3656-41cc-ab0a-a51a49abf421"
+        },
+        {
+          "id": 7,
+          "startedAt": "2026-11-05T17:50:08.8677097Z",
+          "method": "PUT",
+          "path": "/api/v1/workouts/fbd058df-d66b-4c35-80a4-80808d375772",
+          "status": 409,
+          "upstreamStatus": 409,
+          "durationMs": 337.338,
+          "fault": "latency",
+          "rule": "Two devices. One accepted version.",
+          "outcome": "forwarded",
+          "runId": "32545602-3656-41cc-ab0a-a51a49abf421"
+        }
+      ],
+      "durationMs": 436.04,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "cleanupCompleted": true,
+  "stage": "complete",
+  "postgresVersion": "18.3"
+}

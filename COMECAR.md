@@ -17,3 +17,17 @@ Esta versão já inclui o executável Windows. Não precisas de instalar Go, Nod
 Os dados são locais e ficam na pasta `.blackbox`. A demonstração usa uma API própria com dados fictícios. O projeto está preparado para apontar o proxy a outra API; consulta o [README](README.md) para os comandos, arquitetura e limites.
 
 O código e a documentação estão em inglês para facilitar a apresentação no portefólio.
+
+## Integração real com o Fitness Tracker — v0.3
+
+Para ver os resultados já obtidos, abre `docs/evidence/fitness/report.html`. O relatório mostra os três cenários, as 42 verificações e os dados observados. Clica em **Play 75-second walkthrough** para uma apresentação automática. Não precisas de instalar dependências para abrir este relatório.
+
+Para repetir as experiências, com Python, Git e PostgreSQL 18 instalados, executa na pasta do projeto:
+
+```powershell
+python integrations/fitness/start.py --postgres-bin "C:\Program Files\PostgreSQL\18\bin"
+```
+
+O comando prepara o backend original, cria uma base de dados isolada, executa os testes e imprime o caminho para um novo relatório. No final, para os processos que criou. A primeira execução precisa de internet para descarregar dependências. O PostgreSQL habitual do computador não é usado nem parado.
+
+O teste simula um cliente que repete pedidos e dois dispositivos concorrentes; ainda não executa a aplicação móvel. Consulta as [instruções completas](integrations/fitness/README.md) para Docker, requisitos e diagnóstico, e o [guião da apresentação](docs/demo-script.md) para explicares o projeto.

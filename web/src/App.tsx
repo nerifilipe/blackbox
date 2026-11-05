@@ -108,7 +108,7 @@ function App() {
    </nav>
    <div className="sidebar-bottom">
     <div className="local-note"><span className="tiny-cross">+</span><strong>Your machine.<br/>Your experiments.</strong><p>Traffic metadata stays in your local SQLite database.</p><span className="local-label"><ShieldCheck size={13}/> LOCAL BY DESIGN</span></div>
-    <div className="sidebar-version"><span className="status-dot"/>Blackbox <span>v0.2.0</span></div>
+    <div className="sidebar-version"><span className="status-dot"/>Blackbox <span>v0.3.0</span></div>
    </div>
   </aside>
 

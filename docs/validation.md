@@ -61,4 +61,30 @@ Additional backend tests verify that recorded rules survive active-scenario chan
 
 Browser tests exercise actual fragile/resilient runs, comparison and reversal, result downloads, reload persistence, restoration of the recorded rules and client mode, mismatched rules with identical scenario names, legacy behavior, search, responsive overflow, and the distinction between an unavailable history and an empty one. Desktop and mobile screenshots were inspected.
 
-The v0.2 changes are prepared locally for the owner to commit and push. The successful remote v0.1 workflow does not validate these newer changes; CI will run after the next push.
+After publication, [GitHub Actions run 42074904477](https://github.com/nerifilipe/blackbox/actions/runs/42074904477) passed for v0.2 commit `ec9afbc`. This remote result predates v0.3.
+
+## v0.3 — original Fitness Tracker backend
+
+The integration was executed locally on Windows with Python 3.14.3, PostgreSQL 18.3, the rebuilt Blackbox 0.3.0 executable and original Fitness Tracker revision `fbb5b76610652045da4d080175d814f07cf87134`. Python dependencies came from that revision's exact `backend/requirements.lock`.
+
+Three scenarios passed **42 assertions** in each successful execution:
+
+- **Lost response:** the first attempt received no HTTP response while the proxy recorded upstream 200. A direct PostgreSQL read before retry found version 2 and one mutation receipt. The identical retry returned `applied_version = 2` and left persisted state unchanged.
+- **Temporary errors:** the client observed 503, 503, 200. Both failures had upstream status zero and unchanged database snapshots. Only the final attempt produced a receipt and version increment.
+- **Concurrent edits:** two clients started from a barrier with version 1 and distinct mutation IDs. One succeeded; the other received `workout_conflict` (409). Winning notes, exercise IDs and set IDs remained intact.
+
+Both database modes were exercised: a cluster managed by `--postgres-bin`, and an existing local database supplied through `BLACKBOX_TEST_DATABASE_URL` (the CI path). An independent sentinel table in another schema retained its value after the existing-database run; no `blackbox_*` test schema remained. Owned test services stopped. The bootstrap entry point also completed with its own fixture checkout and virtual environment.
+
+The [recorded JSON](evidence/fitness/report.json) contains rules, events, database checkpoints and every assertion. The [HTML report](evidence/fitness/report.html) presents the same evidence and embeds its JSON download. The silent WebM video was recorded from this report; it presents captured evidence rather than new requests executing in the browser.
+
+Additional checks:
+
+- **11 Python harness tests passed**, including false-positive controls for duplicate writes, upstream errors mistaken for dropped responses, forwarded 503s, writes during errors, unrelated conflicts and overwritten winners. Tests also cover report escaping, local destination restrictions, owned-process cleanup and failed setup exit/report behavior.
+- Ruff passed for the integration code.
+- TypeScript/Vite build, Go tests, `go vet` and Windows compilation passed. Backend coverage remained 70.6%; CLI coverage remained 19.3%.
+- The **14 existing console browser tests passed**. The **four new report browser tests passed** on desktop/mobile, covering offline download, assertions, playback/pause/navigation and layout. The complete set contains 18 tests; after report fixes the four affected tests were rerun separately.
+- Screenshots and recording slides were visually inspected. The presentation is checked at 1280 × 720 and the mobile viewport. All five recording slides fit without vertical overflow.
+
+Environment notes: the sandbox's Windows certificate-store handling stalled pip during bootstrap. Setup completed using pip's `legacy-certs` option; certificate verification remained enabled. Git's OpenSSL backend was used for the sandbox checkout. Neither override changes the shipped defaults. As in earlier revisions, completed Playwright runs required explicit shutdown of their isolated server before the Windows runner exited.
+
+Docker Compose and Linux GitHub Actions are configured but were not run locally: Docker Desktop's daemon was unavailable. The new workflow will execute after the owner pushes v0.3. The successful remote v0.2 run does not validate these newer changes. No mobile app, production database or remote user data was involved.

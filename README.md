@@ -6,6 +6,8 @@
 
 Built with **Go · React · TypeScript · SQLite**. The compiled application embeds its frontend and runs without Node.js, Go, a cloud account or an API key.
 
+**New in v0.3:** reproduce three failures against the real Fitness Tracker backend and PostgreSQL: a lost response after commit, temporary 503s and concurrent edits. [Read the case study](docs/fitness-case-study.md), [inspect recorded evidence](docs/evidence/fitness/report.json), or [run it yourself](integrations/fitness/README.md).
+
 ![Blackbox failure lab showing a successful idempotency experiment](docs/images/desktop.png)
 
 ## The experiment
@@ -51,6 +53,7 @@ Each run gets a fresh logical dataset and resets the fault counters. Stop the pr
 - SQLite history, an embedded web frontend and loopback-only listeners.
 - An **Experiments** view with the last 100 completed runs, baseline/comparison selection and side-by-side attempts, writes and outcomes.
 - Immutable per-run scenario snapshots, result downloads and restoration of a recorded setup.
+- A pinned external Fitness Tracker integration with independent database assertions, HTML/JSON evidence and a 75-second offline walkthrough.
 
 ## Compare before and after
 
@@ -93,6 +96,28 @@ With the default demo server running:
 ```
 
 Use `-url http://127.0.0.1:PORT` to select another local control instance. `serve -help` lists addresses and the SQLite file option. Use the analogous `./dist/blackbox` commands on Linux/macOS after building there.
+
+## Test the real Fitness Tracker backend
+
+With a compiled Blackbox binary, Python 3.14, Git and PostgreSQL 18 binaries installed:
+
+```powershell
+python integrations/fitness/start.py --postgres-bin "C:\Program Files\PostgreSQL\18\bin"
+```
+
+This prepares a pinned checkout and Python environment, starts an isolated local PostgreSQL cluster, applies the original migrations, creates synthetic data and executes three experiments. It emits an offline HTML report and JSON, then stops its services and removes the test schema. Exit code zero requires all scenarios and cleanup to succeed. First setup downloads dependencies.
+
+| Failure | Observed result in the recorded run |
+| --- | --- |
+| Response disappears after commit | Same mutation retried; version increases once and one mutation receipt remains |
+| Two injected 503s | No database change during errors; third attempt succeeds |
+| Concurrent edits from version 1 | One succeeds, one receives `workout_conflict`; winning data survives |
+
+The recorded run passed **42 assertions**. This exercises the original backend with a Python client; it does not execute the mobile application's offline queue. These results use their own report, separate from the bundled demo's history.
+
+The report includes **Play 75-second walkthrough**, with actual results on each slide. See [setup and Docker instructions](integrations/fitness/README.md), the [architecture and case study](docs/fitness-case-study.md), [example HTML](docs/evidence/fitness/report.html), [video demonstration](docs/images/fitness-demo.webm), and [presentation script](docs/demo-script.md). Download the HTML to view it locally; GitHub displays its source rather than running it. The JSON download is embedded in the HTML.
+
+![Fitness Tracker integration evidence](docs/images/fitness-desktop.png)
 
 ## Build from source
 
@@ -137,7 +162,7 @@ npm run test:e2e
 
 The tests start an isolated server on ports `19090–19092` with a temporary database. They verify both retry behaviors, the 503 scenario, JSON validation/import/export, re-arming, navigation, filters and responsive overflow. Set `BLACKBOX_BROWSER_CHANNEL=chrome` to use an installed Chrome instead. See [the validation report](docs/validation.md) for checks actually performed on this delivery.
 
-CI builds the frontend, runs `go test -race`, `go vet`, builds the binary and runs browser tests on Linux. The [initial MVP run passed](https://github.com/nerifilipe/blackbox/actions/runs/42016317235). That run predates the v0.2 history feature; see the validation record for the checks on each revision.
+CI builds the frontend, runs `go test -race`, `go vet`, builds the binary and runs browser tests on Linux. The workflow also prepares the pinned Fitness Tracker backend, executes the integration against PostgreSQL and uploads its HTML/JSON evidence. The [v0.2 workflow passed](https://github.com/nerifilipe/blackbox/actions/runs/42074904477); this historical run predates v0.3. See the validation record for checks actually performed on each revision.
 
 ## Architecture and limits
 
@@ -173,12 +198,13 @@ web/src/             React console
 web/tests/           Real-browser integration tests
 scenarios/           Versionable experiment definitions
 scripts/             Reproducible build commands
+integrations/fitness/ Real external backend experiments and offline evidence report
 docs/                Design, validation and real screenshots
 ```
 
 ## Next milestones
 
-1. Integrate a reproducible external test fixture from Fitness Tracker.
+1. Exercise Fitness Tracker's mobile offline queue through the proxy.
 2. Add named scenario storage and a schema for editor autocomplete.
 3. Evaluate streaming and WebSocket fault semantics separately.
 4. Publish platform binaries and record reproducible performance measurements.

@@ -1,5 +1,15 @@
 # Architecture decisions
 
+## External Fitness Tracker experiments (v0.3)
+
+`integrations/fitness` orchestrates the compiled proxy and an unmodified, pinned FastAPI backend. PostgreSQL uses the original migrations and a random per-run schema. A Python client creates synthetic fixtures through real authentication/application routes, sends mutations through the proxy, and checks state through an independent database connection.
+
+Three scenarios cover response loss after commit, transient 503s before forwarding and two edits based on one version. Each asserts client attempts, correlated proxy events and database checkpoints. Reports contain selected metadata and synthetic state; credentials and arbitrary bodies are excluded. Assertion failures and infrastructure errors produce a nonzero exit and failed report.
+
+The runner stops its services and drops its exact schema before reporting overall success. It supports a disposable cluster from PostgreSQL binaries or an existing local test database. It never resets another schema. Abrupt OS termination cannot guarantee cleanup.
+
+These reports remain separate from `Run` and bundled demo history: mutation versions and receipts are not equivalent to stored-workout counts. The renderer provides offline HTML, an embedded JSON download and a timed walkthrough. See the [case study](fitness-case-study.md) for the sequence diagram and the [integration instructions](../integrations/fitness/README.md) for reproduction.
+
 ## One binary, three local listeners
 
 The Go executable embeds the production React bundle. The control server, proxy and bundled demo are separate listeners, so proxy targets never share the control API namespace. An explicit target disables the bundled demo. Listeners bind only to loopback addresses.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — 2026-11-05
+
+- Integrate the original Fitness Tracker backend at a pinned revision, using its migrations, HTTP authentication and PostgreSQL semantics.
+- Reproduce post-commit response loss, two temporary 503 errors and concurrent edits with explicit client, proxy and database assertions.
+- Prepare the fixture with one command; support a disposable local PostgreSQL cluster or an existing local test database.
+- Export standalone HTML/JSON evidence and a 75-second offline presentation using recorded results.
+- Add false-positive regression controls, report browser tests, a case study and a Portuguese presentation script.
+- Extend CI with PostgreSQL integration execution and downloadable evidence artifacts.
+- Keep external results separate from bundled-demo history because their invariants differ.
+
 ## 0.2.0 — 2026-11-05
 
 - Browse the 100 most recent completed experiments and compare any two results.

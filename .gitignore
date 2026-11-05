@@ -6,3 +6,7 @@ playwright-report/
 test-results/
 *.log
 *.tsbuildinfo
+__pycache__/
+*.pyc
+.venv/
+.ruff_cache/

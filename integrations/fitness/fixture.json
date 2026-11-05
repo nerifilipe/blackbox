@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/nerifilipe/fitness-tracker-app.git",
+  "revision": "fbb5b76610652045da4d080175d814f07cf87134",
+  "backend": "backend",
+  "description": "Unmodified Fitness Tracker API with real PostgreSQL migrations and HTTP authentication."
+}

@@ -5,7 +5,19 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: blackbox
+          POSTGRES_PASSWORD: blackbox_local
+          POSTGRES_DB: blackbox
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U blackbox -d blackbox"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,6 +38,37 @@ jobs:
         run: go vet ./...
       - name: Build executable
         run: mkdir -p dist && go build -trimpath -o dist/blackbox ./cmd/blackbox
+      - name: Checkout pinned Fitness Tracker fixture
+        uses: actions/checkout@v4
+        with:
+          repository: nerifilipe/fitness-tracker-app
+          ref: fbb5b76610652045da4d080175d814f07cf87134
+          path: .blackbox/fitness-tracker
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: .blackbox/fitness-tracker/backend/requirements.lock
+      - name: Install fixture dependencies
+        run: python -m pip install -r .blackbox/fitness-tracker/backend/requirements.lock
+      - name: Check integration harness
+        run: |
+          python -m ruff check integrations/fitness
+          python -m unittest discover -s integrations/fitness -p 'test_*.py' -v
+      - name: Real Fitness Tracker experiments
+        run: python integrations/fitness/run.py --fitness-repo .blackbox/fitness-tracker --out .blackbox/fitness-results
+      - name: Upload integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fitness-integration-evidence
+          include-hidden-files: true
+          path: |
+            .blackbox/fitness-results/report.json
+            .blackbox/fitness-results/report.html
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Install browser
         working-directory: web
         run: npx playwright install --with-deps chromium
