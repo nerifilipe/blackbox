@@ -138,12 +138,14 @@ type Attempt struct {
 	Outcome string `json:"outcome"`
 }
 type Run struct {
-	ID             string    `json:"id"`
-	StartedAt      string    `json:"startedAt"`
-	Mode           string    `json:"mode"`
-	Scenario       string    `json:"scenario"`
-	Attempts       []Attempt `json:"attempts"`
-	StoredWorkouts int       `json:"storedWorkouts"`
-	Passed         bool      `json:"passed"`
-	DurationMS     int64     `json:"durationMs"`
+	ID               string    `json:"id"`
+	StartedAt        string    `json:"startedAt"`
+	Mode             string    `json:"mode"`
+	Scenario         string    `json:"scenario"`
+	ScenarioSnapshot *Scenario `json:"scenarioSnapshot,omitempty"`
+	Fixture          string    `json:"fixture,omitempty"`
+	Attempts         []Attempt `json:"attempts"`
+	StoredWorkouts   int       `json:"storedWorkouts"`
+	Passed           bool      `json:"passed"`
+	DurationMS       int64     `json:"durationMs"`
 }

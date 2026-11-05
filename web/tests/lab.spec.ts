@@ -82,3 +82,75 @@ test('navigation, filters and narrow viewport avoid page overflow', async ({ pag
  await expect(page.getByRole('heading', { name: 'Make failure repeatable.' })).toBeVisible();
  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 });
+
+test('history compares real runs, restores the saved rules and survives reload', async ({ page, request }, info) => {
+ const fragileResponse = await request.post('/api/demo/run', { data: { mode: 'fragile' } });
+ expect(fragileResponse.ok()).toBeTruthy();
+ const fragile = await fragileResponse.json();
+ const resilientResponse = await request.post('/api/demo/run', { data: { mode: 'resilient' } });
+ expect(resilientResponse.ok()).toBeTruthy();
+ const resilient = await resilientResponse.json();
+ await page.goto('/');
+ await page.getByRole('button', { name: 'Experiments', exact: true }).click();
+ await expect(page.getByRole('heading', { name: 'Before. After. Understood.' })).toBeVisible();
+ await page.getByRole('combobox', { name: 'Baseline experiment', exact: true }).selectOption(fragile.id);
+ await page.getByRole('combobox', { name: 'Comparison experiment', exact: true }).selectOption(resilient.id);
+ await expect(page.getByText('The invariant recovered.', { exact: true })).toBeVisible();
+ await expect(page.getByRole('article', { name: 'Baseline experiment' })).toContainText('Unprotected client');
+ await expect(page.getByRole('article', { name: 'Comparison experiment' })).toContainText('Idempotent client');
+ expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+ if (process.env.BLACKBOX_SCREENSHOTS) await page.screenshot({ path: join(process.env.BLACKBOX_SCREENSHOTS, `history-${info.project.name}.png`), fullPage: true });
+ const downloadPromise = page.waitForEvent('download');
+ await page.getByRole('article', { name: 'Comparison experiment' }).getByRole('link', { name: 'Export result' }).click();
+ expect((await downloadPromise).suggestedFilename()).toBe('blackbox-experiment.json');
+ const snapshot = await request.get(`/api/runs/${resilient.id}/scenario`);
+ expect((await snapshot.json()).rules[0].kind).toBe('drop_response');
+ await page.getByRole('button', { name: 'Swap baseline and comparison' }).click();
+ await expect(page.getByText('The invariant regressed.', { exact: true })).toBeVisible();
+ await page.reload();
+ await page.getByRole('button', { name: 'Experiments', exact: true }).click();
+ await expect(page.getByText('The invariant recovered.', { exact: true })).toBeVisible();
+ const edited = { ...scenario, rules: [{ ...scenario.rules[0], kind: 'latency', delayMs: 50 }] };
+ expect((await request.put('/api/scenario', { data: edited })).ok()).toBeTruthy();
+ await page.getByRole('article', { name: 'Comparison experiment' }).getByRole('button', { name: 'Restore setup' }).click();
+ await expect(page.getByRole('heading', { name: 'Make failure repeatable.' })).toBeVisible();
+ await expect(page.getByRole('button', { name: 'Idempotent', exact: true })).toHaveAttribute('aria-pressed', 'true');
+ const active = await request.get('/api/scenario');
+ expect((await active.json()).rules[0].kind).toBe('drop_response');
+});
+
+test('comparison flags different rules with the same name and handles legacy runs', async ({ page, request }) => {
+ const before = await (await request.post('/api/demo/run', { data: { mode: 'fragile' } })).json();
+ const edited = { ...scenario, rules: [{ ...scenario.rules[0], kind: 'latency', delayMs: 50 }] };
+ expect((await request.put('/api/scenario', { data: edited })).ok()).toBeTruthy();
+ const after = await (await request.post('/api/demo/run', { data: { mode: 'resilient' } })).json();
+ await page.goto('/');
+ await page.getByRole('button', { name: 'Experiments', exact: true }).click();
+ await page.getByRole('combobox', { name: 'Baseline experiment', exact: true }).selectOption(before.id);
+ await page.getByRole('combobox', { name: 'Comparison experiment', exact: true }).selectOption(after.id);
+ await expect(page.getByText('Different fault configurations.', { exact: true })).toBeVisible();
+ await expect(page.getByText('The invariant recovered.', { exact: true })).not.toBeVisible();
+ // Legacy records have no configuration snapshot; never fabricate one from current settings.
+ const { scenarioSnapshot: _snapshot, fixture: _fixture, ...legacy } = before;
+ await page.route('**/api/runs', route => route.fulfill({ json: { runs: [after, legacy] } }));
+ await page.getByRole('button', { name: 'Refresh history' }).click();
+ await expect(page.getByText('Configuration unavailable.', { exact: true })).toBeVisible();
+ await expect(page.getByRole('article', { name: 'Baseline experiment' }).getByRole('button', { name: 'Restore setup' })).toBeDisabled();
+ await page.getByRole('textbox', { name: 'Search experiments' }).fill('does-not-exist');
+ await expect(page.getByText('No matching experiments', { exact: true })).toBeVisible();
+});
+
+test('history distinguishes an unavailable database from an empty history', async ({ page }) => {
+ let unavailable = true;
+ await page.route('**/api/runs', route => unavailable
+  ? route.fulfill({ status: 500, json: { error: 'could not load experiment history' } })
+  : route.fulfill({ json: { runs: [] } }));
+ await page.goto('/');
+ await page.getByRole('button', { name: 'Experiments', exact: true }).click();
+ await expect(page.getByRole('heading', { name: 'History is unavailable.' })).toBeVisible();
+ await expect(page.getByText('Your experiments belong here.', { exact: true })).not.toBeVisible();
+ unavailable = false;
+ await page.getByRole('button', { name: 'Refresh history' }).click();
+ await expect(page.getByRole('heading', { name: 'Your experiments belong here.' })).toBeVisible();
+ await expect(page.getByRole('alert')).not.toBeVisible();
+});

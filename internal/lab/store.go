@@ -137,6 +137,40 @@ func (s *Store) LastRun() (*Run, error) {
 	err = json.Unmarshal([]byte(raw), &r)
 	return &r, err
 }
+
+// Runs returns the retained, completed experiments in insertion order, newest
+// first. Snapshots are read from each record, never from the active scenario.
+func (s *Store) Runs() ([]Run, error) {
+	rows, err := s.db.Query(`SELECT payload FROM runs ORDER BY id DESC LIMIT 100`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	runs := []Run{}
+	for rows.Next() {
+		var raw string
+		if err := rows.Scan(&raw); err != nil {
+			return nil, err
+		}
+		var run Run
+		if err := json.Unmarshal([]byte(raw), &run); err != nil {
+			return nil, err
+		}
+		runs = append(runs, run)
+	}
+	return runs, rows.Err()
+}
+
+func (s *Store) Run(id string) (Run, error) {
+	var raw string
+	err := s.db.QueryRow(`SELECT payload FROM runs WHERE json_extract(payload, '$.id') = ? ORDER BY id DESC LIMIT 1`, id).Scan(&raw)
+	if err != nil {
+		return Run{}, err
+	}
+	var run Run
+	err = json.Unmarshal([]byte(raw), &run)
+	return run, err
+}
 func (s *Store) SaveWorkout(runID, key string) (int64, bool, error) {
 	var value any
 	if key != "" {

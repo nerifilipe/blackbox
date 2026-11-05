@@ -2,6 +2,8 @@
 
 **Make failure repeatable.** A local HTTP failure lab with a visual request stream, bounded fault injection and a demo that shows why retries need idempotency.
 
+[![Verify Blackbox](https://github.com/nerifilipe/blackbox/actions/workflows/ci.yml/badge.svg)](https://github.com/nerifilipe/blackbox/actions/workflows/ci.yml)
+
 Built with **Go · React · TypeScript · SQLite**. The compiled application embeds its frontend and runs without Node.js, Go, a cloud account or an API key.
 
 ![Blackbox failure lab showing a successful idempotency experiment](docs/images/desktop.png)
@@ -20,7 +22,7 @@ These are real HTTP requests through a real proxy. The demo API is a small bundl
 
 ## Run the Windows build
 
-In this delivery, the executable is in `dist/blackbox.exe`.
+If you have the Windows package, the executable is in `dist/blackbox.exe`. For a Git checkout, follow **Build from source** first; executables are not committed to the repository.
 
 1. Double-click **`Start-Blackbox.cmd`**.
 2. Open **http://127.0.0.1:9090**.
@@ -47,6 +49,20 @@ Each run gets a fresh logical dataset and resets the fault counters. Stop the pr
 - A demo with unprotected and idempotent clients, explicit retries and database assertions.
 - CLI scenario execution with machine-readable JSON and meaningful exit codes.
 - SQLite history, an embedded web frontend and loopback-only listeners.
+- An **Experiments** view with the last 100 completed runs, baseline/comparison selection and side-by-side attempts, writes and outcomes.
+- Immutable per-run scenario snapshots, result downloads and restoration of a recorded setup.
+
+## Compare before and after
+
+Run **The lost response** with the **Unprotected** client, then with the **Idempotent** client. Open **Experiments** in the sidebar. The older run becomes baseline A and the newer run becomes comparison B; selectors let you compare any two retained runs.
+
+Blackbox compares the saved, enabled rules in their original order and the demo fixture version. It ignores display labels and settings irrelevant to the selected fault kind. Different configurations receive an explicit warning, even if their scenario names are identical. Durations include injected delays and retry waits; the comparison is functional evidence, not a performance benchmark. External traffic can still consume the same fault budgets.
+
+**Export result** downloads the result and its configuration. **Restore setup** loads the saved rules and client mode into the lab and re-arms the scenario; it does not send requests until you start a new experiment.
+
+Existing v0.1 history remains readable. Older runs have no configuration snapshot, so Blackbox marks them as legacy and disables restoration instead of guessing their original rules. No database reset is required.
+
+![Blackbox experiment history comparing unsafe and idempotent retries](docs/images/history-desktop.png)
 
 ## Connect your application
 
@@ -121,7 +137,7 @@ npm run test:e2e
 
 The tests start an isolated server on ports `19090–19092` with a temporary database. They verify both retry behaviors, the 503 scenario, JSON validation/import/export, re-arming, navigation, filters and responsive overflow. Set `BLACKBOX_BROWSER_CHANNEL=chrome` to use an installed Chrome instead. See [the validation report](docs/validation.md) for checks actually performed on this delivery.
 
-CI builds the frontend, runs `go test -race`, `go vet`, builds the binary and runs browser tests on Linux. The workflow is included; no remote workflow run is claimed for this local delivery.
+CI builds the frontend, runs `go test -race`, `go vet`, builds the binary and runs browser tests on Linux. The [initial MVP run passed](https://github.com/nerifilipe/blackbox/actions/runs/42016317235). That run predates the v0.2 history feature; see the validation record for the checks on each revision.
 
 ## Architecture and limits
 
@@ -139,7 +155,7 @@ Your client ──HTTP──> Blackbox proxy ──HTTP(S)──> Target API
 - Request bodies are buffered up to 4 MiB before fault evaluation. A drop consumes up to 1 MiB of the upstream response before aborting the client connection. The upstream status proves that a response arrived; only the demo assertion proves its database outcome.
 - Proxy requests have a 25-second context deadline, a 15-second upstream header timeout and 30-second server write timeout. The demo uses a 12-second timeout per attempt and at most three attempts.
 - No request/response bodies, headers or query strings are stored. Paths may still contain sensitive identifiers. Do not treat metadata as automatically anonymous.
-- History retains the most recent 5,000 requests and 100 completed demo results. The UI shows the most recent 200 requests and the latest result; its metrics cover those visible requests.
+- History retains the most recent 5,000 requests and 100 completed demo results. The lab shows 200 requests and the latest result; its request metrics cover those visible requests. The Experiments view loads the retained results separately, including each new run's configuration snapshot.
 - The console refreshes every second. Durations measure the proxy handler, including injected delay; they are not end-to-end browser measurements.
 - External traffic shares the active rule budgets. Run isolated experiments for controlled comparisons. Rule reservation is deterministic for arrival order; OS/network scheduling is not deterministic.
 - Exported scenarios reproduce fault rules, not database state, client scheduling or an entire distributed system.
@@ -163,10 +179,9 @@ docs/                Design, validation and real screenshots
 ## Next milestones
 
 1. Integrate a reproducible external test fixture from Fitness Tracker.
-2. Add run-to-run comparison and a browsable experiment history.
-3. Add named scenario storage and a schema for editor autocomplete.
-4. Evaluate streaming and WebSocket fault semantics separately.
-5. Publish platform binaries and record reproducible performance measurements.
+2. Add named scenario storage and a schema for editor autocomplete.
+3. Evaluate streaming and WebSocket fault semantics separately.
+4. Publish platform binaries and record reproducible performance measurements.
 
 ## License
 

@@ -1,6 +1,7 @@
 package lab
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -69,6 +70,46 @@ func (c *Control) Handler() http.Handler {
 		sc, _ := c.Engine.Snapshot()
 		w.Header().Set("Content-Disposition", `attachment; filename="blackbox-scenario.json"`)
 		writeJSON(w, 200, sc)
+	})
+	mux.HandleFunc("GET /api/runs", func(w http.ResponseWriter, r *http.Request) {
+		runs, err := c.Store.Runs()
+		if err != nil {
+			writeError(w, 500, "could not load experiment history")
+			return
+		}
+		writeJSON(w, 200, map[string]any{"runs": runs})
+	})
+	loadRun := func(w http.ResponseWriter, r *http.Request) (Run, bool) {
+		run, err := c.Store.Run(r.PathValue("id"))
+		if err == sql.ErrNoRows {
+			writeError(w, 404, "experiment not found or no longer retained")
+			return run, false
+		}
+		if err != nil {
+			writeError(w, 500, "could not load experiment")
+			return run, false
+		}
+		return run, true
+	}
+	mux.HandleFunc("GET /api/runs/{id}", func(w http.ResponseWriter, r *http.Request) {
+		run, ok := loadRun(w, r)
+		if !ok {
+			return
+		}
+		w.Header().Set("Content-Disposition", `attachment; filename="blackbox-experiment.json"`)
+		writeJSON(w, 200, run)
+	})
+	mux.HandleFunc("GET /api/runs/{id}/scenario", func(w http.ResponseWriter, r *http.Request) {
+		run, ok := loadRun(w, r)
+		if !ok {
+			return
+		}
+		if run.ScenarioSnapshot == nil {
+			writeError(w, 409, "this older experiment has no saved scenario configuration")
+			return
+		}
+		w.Header().Set("Content-Disposition", `attachment; filename="blackbox-scenario.json"`)
+		writeJSON(w, 200, run.ScenarioSnapshot)
 	})
 	mux.HandleFunc("PUT /api/scenario", func(w http.ResponseWriter, r *http.Request) {
 		var sc Scenario

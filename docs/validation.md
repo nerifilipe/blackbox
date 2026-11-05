@@ -1,6 +1,6 @@
 # Validation record — 2026-11-05
 
-This report describes checks actually run on the local Windows delivery. It does not imply that a remote CI workflow has run or that an external fitness application has been integrated.
+This report records the original v0.1 Windows checks and the v0.2 update below. No external fitness application has been integrated.
 
 ## Environment
 
@@ -28,7 +28,7 @@ This report describes checks actually run on the local Windows delivery. It does
 | Help command | Exit code 0 |
 | Screenshot inspection | Desktop and mobile layouts inspected |
 
-The final Go coverage measurement was 68.8% of statements in `internal/lab` and 19.3% in `cmd/blackbox`. The command-line executable was additionally exercised outside that coverage run. Coverage is not a claim of exhaustive correctness.
+The original v0.1 Go coverage measurement was 68.8% of statements in `internal/lab` and 19.3% in `cmd/blackbox`. The command-line executable was additionally exercised outside that coverage run. Coverage is not a claim of exhaustive correctness.
 
 ## Important behavior verified
 
@@ -49,4 +49,16 @@ The initial Windows browser test runner completed all eight tests but waited dur
 
 The final frontend build used `npm run build -- --configLoader native` to avoid an esbuild parent-directory lookup blocked by the managed sandbox. The normal build had also succeeded earlier. This changes how the Vite configuration is loaded, not the produced application features.
 
-The race detector was not run locally because a CGO C compiler was unavailable. The included Linux CI workflow configures `go test -race`; that workflow has not yet been run remotely. No load benchmark, real mobile-device test, WebSocket test or external Fitness Tracker integration is claimed.
+The race detector was not run locally because a CGO C compiler was unavailable. At the time of the original local delivery, the workflow had not run remotely. After publication, [GitHub Actions run 42016317235](https://github.com/nerifilipe/blackbox/actions/runs/42016317235) passed for commit `a14ba10`, including the Linux race detector, vet, executable build and browser tests. This remote result covers v0.1, not the subsequent local v0.2 changes. No load benchmark, real mobile-device test, WebSocket test or external Fitness Tracker integration is claimed.
+
+## v0.2 local update — experiment history and comparison
+
+The history update passed the TypeScript/Vite build, `go test ./... -count=1 -cover`, `go vet ./...` and the Windows executable build. Go coverage in `internal/lab` is now 70.6%; the CLI package remains at 19.3%.
+
+All **14 Playwright tests passed**: seven on desktop and seven at the mobile viewport. The completed test server again required explicit shutdown in the managed Windows environment before the runner exited successfully.
+
+Additional backend tests verify that recorded rules survive active-scenario changes and database reopening, old records remain readable, retention preserves the newest 100 results, expired IDs return 404, legacy configuration export returns 409, and exported configurations come from the selected run rather than current settings.
+
+Browser tests exercise actual fragile/resilient runs, comparison and reversal, result downloads, reload persistence, restoration of the recorded rules and client mode, mismatched rules with identical scenario names, legacy behavior, search, responsive overflow, and the distinction between an unavailable history and an empty one. Desktop and mobile screenshots were inspected.
+
+The v0.2 changes are prepared locally for the owner to commit and push. The successful remote v0.1 workflow does not validate these newer changes; CI will run after the next push.

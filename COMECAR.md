@@ -8,6 +8,8 @@
 
 A falha do primeiro caso é intencional: é precisamente o problema que a experiência demonstra.
 
+Na versão 0.2, abre **Experiments** na barra lateral para comparar os dois resultados. Podes escolher qualquer execução como referência **A** e comparação **B**, exportar o resultado ou usar **Restore setup** para recuperar as regras e o modo do cliente. A aplicação avisa quando as configurações são diferentes. Os resultados antigos continuam disponíveis; só as novas execuções incluem uma cópia das regras.
+
 Experimenta também **The slow lane** e **Third time lucky**. Clica numa linha do fluxo de pedidos para comparar a resposta do servidor com aquilo que chegou ao cliente.
 
 Esta versão já inclui o executável Windows. Não precisas de instalar Go, Node.js ou uma base de dados para a usar. Mantém o terminal aberto enquanto experimentas e usa **Ctrl+C** para parar.

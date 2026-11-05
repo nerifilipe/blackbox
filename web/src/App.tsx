@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { Activity, ArrowDown, ArrowDownToLine, ArrowRight, ArrowUpRight, BookOpen, Check, CheckCircle2, ChevronRight, Clock3, Code2, Copy, FileJson, FlaskConical, Layers3, Loader2, Network, Play, Plus, Radio, RotateCcw, Search, Settings2, ShieldCheck, Terminal, Unplug, Upload, X, XCircle, Zap } from 'lucide-react';
+import { Activity, ArrowDown, ArrowDownToLine, ArrowRight, ArrowUpRight, BookOpen, Check, CheckCircle2, ChevronRight, Clock3, Code2, Copy, FileJson, FlaskConical, History, Layers3, Loader2, Network, Play, Plus, Radio, RotateCcw, Search, Settings2, ShieldCheck, Terminal, Unplug, Upload, X, XCircle, Zap } from 'lucide-react';
+import ExperimentHistory from './ExperimentHistory';
+import type { Scenario, TrafficEvent, Run, State } from './types';
 
-type Rule = { id: string; name: string; method: string; path: string; kind: string; limit: number; delayMs: number; status: number; enabled: boolean };
-type Scenario = { version: number; name: string; description: string; rules: Rule[] };
-type TrafficEvent = { id: number; startedAt: string; method: string; path: string; status: number; upstreamStatus: number; durationMs: number; fault: string; rule: string; outcome: string; runId: string };
-type Run = { id: string; startedAt: string; mode: string; scenario: string; attempts: { number: number; status: number; outcome: string }[]; storedWorkouts: number; passed: boolean; durationMs: number };
-type State = { target: string; proxyUrl: string; demoAvailable: boolean; scenario: Scenario; counts: Record<string, number>; events: TrafficEvent[]; lastRun: Run | null };
 
 const presets: Scenario[] = [
  { version: 1, name: 'The lost response', description: 'The server saves the workout. The response never arrives. Is a retry safe?', rules: [{ id: 'lost-response', name: 'Drop the first response', method: 'POST', path: '/workouts', kind: 'drop_response', limit: 1, delayMs: 0, status: 0, enabled: true }] },
@@ -106,22 +103,25 @@ function App() {
    <nav aria-label="Main navigation">
     <button className={page === 'lab' ? 'nav-item active' : 'nav-item'} onClick={() => setPage('lab')}><FlaskConical size={18}/>Failure lab<span className="nav-counter">01</span></button>
     <button className={page === 'traffic' ? 'nav-item active' : 'nav-item'} onClick={() => setPage('traffic')}><Activity size={18}/>Request stream<span className="nav-counter">{events.length}</span></button>
+    <button className={page === 'history' ? 'nav-item active' : 'nav-item'} onClick={() => setPage('history')}><History size={18}/>Experiments</button>
     <button className={page === 'guide' ? 'nav-item active' : 'nav-item'} onClick={() => setPage('guide')}><BookOpen size={18}/>Field guide<ArrowUpRight size={14}/></button>
    </nav>
    <div className="sidebar-bottom">
     <div className="local-note"><span className="tiny-cross">+</span><strong>Your machine.<br/>Your experiments.</strong><p>Traffic metadata stays in your local SQLite database.</p><span className="local-label"><ShieldCheck size={13}/> LOCAL BY DESIGN</span></div>
-    <div className="sidebar-version"><span className="status-dot"/>Blackbox <span>v0.1.0</span></div>
+    <div className="sidebar-version"><span className="status-dot"/>Blackbox <span>v0.2.0</span></div>
    </div>
   </aside>
 
   <div className="main-shell">
-   <header className="topbar"><div className="breadcrumb"><span>Workspace</span><ChevronRight size={13}/><strong>{page === 'lab' ? 'Failure lab' : page === 'traffic' ? 'Request stream' : 'Field guide'}</strong></div><div className="topbar-status"><span className={`status-dot ${connectionError ? 'offline' : ''}`}/>{connectionError ? 'Disconnected' : state ? 'Local proxy online' : 'Connecting'}<span className="topbar-divider"/><span className="mono">HTTP / 1.1</span></div></header>
+   <header className="topbar"><div className="breadcrumb"><span>Workspace</span><ChevronRight size={13}/><strong>{page === 'lab' ? 'Failure lab' : page === 'traffic' ? 'Request stream' : page === 'history' ? 'Experiments' : 'Field guide'}</strong></div><div className="topbar-status"><span className={`status-dot ${connectionError ? 'offline' : ''}`}/>{connectionError ? 'Disconnected' : state ? 'Local proxy online' : 'Connecting'}<span className="topbar-divider"/><span className="mono">HTTP / 1.1</span></div></header>
    <main>
     {connectionError && <div className="message error" role="alert"><Unplug size={16}/>{connectionError}</div>}
     {error && <div className="message error" role="alert"><XCircle size={16}/><span>{error}</span><button onClick={() => setError('')} aria-label="Dismiss error"><X size={15}/></button></div>}
     {notice && <div className="message success" role="status"><Check size={16}/><span>{notice}</span><button onClick={() => setNotice('')} aria-label="Dismiss notification"><X size={15}/></button></div>}
 
-    {page !== 'guide' && <>
+    {page === 'history' && <ExperimentHistory lastRunID={lastRun?.id} disabled={disable} onOpenLab={() => setPage('lab')} onRestore={run => void action(async () => { if (!run.scenarioSnapshot) throw new Error('This experiment has no saved configuration.'); await api('/scenario', 'PUT', run.scenarioSnapshot); setMode(run.mode); setPage('lab'); setNotice('Saved configuration restored and armed. Run a new experiment to compare results.'); })}/>}
+
+    {(page === 'lab' || page === 'traffic') && <>
      <section className="page-heading"><div><div className="eyebrow"><span/> ENGINEERING FOR THE UNEXPECTED</div><h1>{page === 'lab' ? 'Make failure repeatable.' : 'Every request. In focus.'}</h1><p>{page === 'lab' ? 'Break the connection. Understand the consequence.' : 'Inspect what reached the server — and what made it back.'}</p></div><button className="button primary" disabled={disable || !state?.demoAvailable} onClick={() => void runExperiment()}>{running ? <Loader2 size={16} className="spin"/> : <Play size={15} fill="currentColor"/>}{running ? 'Experiment running…' : 'Run experiment'}<span className="button-arrow"><ArrowUpRight size={16}/></span></button></section>
 
      <section className="connection-strip" aria-label="Proxy connection"><div className="connection-node"><span className="node-icon"><Terminal size={17}/></span><div><label>CLIENT ENTRY POINT</label><button className="copy-address" disabled={!state} onClick={() => state && void copy(state.proxyUrl)}><code>{state?.proxyUrl || 'Connecting…'}</code><Copy size={12}/></button></div></div><div className="connection-line"><span/><ArrowRight size={16}/></div><div className="proxy-node"><span className="brand-mark small"><Layers3 size={16}/></span><strong>Blackbox</strong><span className="mini-tag">PROXY</span></div><div className="connection-line"><span/><ArrowRight size={16}/></div><div className="connection-node"><span className="node-icon"><Network size={17}/></span><div><label>{state?.demoAvailable ? 'BUNDLED WORKOUT API' : 'UPSTREAM TARGET'}</label><code>{state?.target || '—'}</code></div><span className="status-dot"/></div></section>

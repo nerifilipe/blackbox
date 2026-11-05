@@ -34,7 +34,17 @@ A mutex prevents overlapping demo runs and scenario mutations through the contro
 
 ## Persistence and recovery
 
-SQLite stores the current scenario, request metadata, completed experiment results and synthetic demo rows. Retention is bounded to 5,000 request events and 100 results. Demo rows outside the retained completed runs are cleaned after a run. The UI reads 200 events and the latest result.
+SQLite stores the current scenario, request metadata, completed experiment results and synthetic demo rows. Retention is bounded to 5,000 request events and 100 results. Demo rows outside the retained completed runs are cleaned after a run. The lab reads 200 events and the latest result. The Experiments view loads the 100 retained results separately; they are not added to the one-second state polling response.
+
+## Recorded configurations and comparison
+
+Each new run stores a deep-copied scenario snapshot plus `workout-v1`, the demo fixture version. The snapshot is captured before the first request and encoded into the run's existing JSON payload. Editing the active scenario cannot change previous results. This is an additive payload change, so the existing SQLite schema and v0.1 records remain valid.
+
+`GET /api/runs` returns retained completed runs, newest first. `GET /api/runs/{id}` downloads a result including its snapshot, while `GET /api/runs/{id}/scenario` exports only the recorded scenario. Expired or unknown IDs return 404. Legacy scenario export returns 409 because the original rules were never stored.
+
+The UI compares the fixture version and ordered enabled rules, including method, exact path, kind, budget and parameters relevant to that kind. It deliberately ignores rule labels and IDs. Different conditions or missing legacy snapshots prevent the UI from describing an outcome change as recovery or regression under matching conditions. Runs still share the proxy with external traffic, so this is not proof of causal isolation under competing requests.
+
+Restoring a setup uses the existing validated scenario update endpoint, resets its counters and selects the recorded client mode. It does not replay historical writes. A new run still receives a fresh logical dataset.
 
 An interrupted demo may leave synthetic rows without a completed result until a later run cleans them. In-flight requests do not survive process termination. No exactly-once delivery claim is made for arbitrary systems.
 
@@ -48,4 +58,4 @@ JSON mutation endpoints reject unknown fields and oversized documents. Scenarios
 
 The application is a local HTTP failure lab, with a reproducible fixture and a visual explanation of actual outcomes. It does not snapshot external databases, capture request bodies, reconstruct arbitrary user sessions or offer deterministic distributed-system replay.
 
-Useful future work includes a general assertion runner, external fixture integration, measured proxy overhead, history comparison and separate WebSocket semantics. Those features should be added with explicit recovery and correctness tests.
+Useful future work includes a general assertion runner, external fixture integration, measured proxy overhead and separate WebSocket semantics. Those features should be added with explicit recovery and correctness tests.

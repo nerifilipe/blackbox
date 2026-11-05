@@ -54,7 +54,7 @@ func RunDemo(ctx context.Context, proxyURL, mode string, engine *Engine, store *
 	start := time.Now()
 	scenario, _ := engine.Snapshot()
 	engine.Reset()
-	run := Run{ID: hex.EncodeToString(random), Mode: mode, Scenario: scenario.Name, StartedAt: start.UTC().Format(time.RFC3339Nano), Attempts: []Attempt{}}
+	run := Run{ID: hex.EncodeToString(random), Mode: mode, Scenario: scenario.Name, ScenarioSnapshot: &scenario, Fixture: "workout-v1", StartedAt: start.UTC().Format(time.RFC3339Nano), Attempts: []Attempt{}}
 	tr := http.DefaultTransport.(*http.Transport).Clone()
 	tr.Proxy = nil
 	tr.DisableKeepAlives = true
