@@ -1,0 +1,1623 @@
+{
+  "startedAt": "2026-11-10T14:56:14.191538+00:00",
+  "cases": [
+    {
+      "name": "CRUD, query forwarding and metadata privacy",
+      "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39",
+      "checks": [
+        {
+          "name": "POST status",
+          "actual": 201,
+          "expected": 201,
+          "passed": true
+        },
+        {
+          "name": "UTF-8 JSON round trip",
+          "actual": "A\u00e7\u00e3o \u2014 integra\u00e7\u00e3o independente",
+          "expected": "A\u00e7\u00e3o \u2014 integra\u00e7\u00e3o independente",
+          "passed": true
+        },
+        {
+          "name": "Query-bearing request forwarded",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Query filter preserved",
+          "actual": [
+            2
+          ],
+          "expected": [
+            2
+          ],
+          "passed": true
+        },
+        {
+          "name": "PATCH status",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "PATCH persisted",
+          "actual": "Updated",
+          "expected": "Updated",
+          "passed": true
+        },
+        {
+          "name": "DELETE status",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "DELETE persisted",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 5,
+          "expected": 5,
+          "passed": true
+        },
+        {
+          "name": "Unmatched rule did not fire",
+          "actual": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "expected": [
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "passed": true
+        },
+        {
+          "name": "Metadata omits synthetic-header-marker",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "Metadata omits synthetic-query-marker",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "Metadata omits test-author",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "Metadata omits query_marker",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "http_error",
+            "method": "POST",
+            "path": "/unmatched",
+            "kind": "http_error",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 503,
+            "enabled": true
+          }
+        ]
+      },
+      "persistenceReads": [
+        {
+          "collection": "posts",
+          "waitMs": 23.55,
+          "rows": [
+            {
+              "id": 1,
+              "title": "Original",
+              "author": "other"
+            },
+            {
+              "title": "Updated",
+              "author": "test-author",
+              "id": 2
+            }
+          ]
+        },
+        {
+          "collection": "posts",
+          "waitMs": 3.67,
+          "rows": [
+            {
+              "id": 1,
+              "title": "Original",
+              "author": "other"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "startedAt": "2026-11-10T14:56:16.5829088Z",
+          "method": "POST",
+          "path": "/posts",
+          "status": 201,
+          "upstreamStatus": 201,
+          "durationMs": 68.75,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+        },
+        {
+          "id": 2,
+          "startedAt": "2026-11-10T14:56:16.6560118Z",
+          "method": "GET",
+          "path": "/posts",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 26.019,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+        },
+        {
+          "id": 3,
+          "startedAt": "2026-11-10T14:56:16.6857139Z",
+          "method": "GET",
+          "path": "/posts",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 10.629,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+        },
+        {
+          "id": 4,
+          "startedAt": "2026-11-10T14:56:16.7001609Z",
+          "method": "PATCH",
+          "path": "/posts/2",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 18.289,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+        },
+        {
+          "id": 5,
+          "startedAt": "2026-11-10T14:56:16.7639292Z",
+          "method": "DELETE",
+          "path": "/posts/2",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 35.387,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Lost POST response exposes duplicate creation",
+      "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8",
+      "checks": [
+        {
+          "name": "First response lost",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Write persisted before retry",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Retry succeeded",
+          "actual": 201,
+          "expected": 201,
+          "passed": true
+        },
+        {
+          "name": "Two records expose unsafe retry",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Records have distinct IDs",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Dropped response followed upstream commit acknowledgement",
+          "actual": [
+            [
+              0,
+              201,
+              "response_dropped"
+            ],
+            [
+              201,
+              201,
+              "forwarded"
+            ]
+          ],
+          "expected": [
+            [
+              0,
+              201,
+              "response_dropped"
+            ],
+            [
+              201,
+              201,
+              "forwarded"
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "drop_response",
+            "method": "POST",
+            "path": "/lost",
+            "kind": "drop_response",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "persistenceReads": [
+        {
+          "collection": "lost",
+          "waitMs": 4.37,
+          "rows": [
+            {
+              "action": "one-user-action",
+              "id": 1
+            }
+          ]
+        },
+        {
+          "collection": "lost",
+          "waitMs": 2.98,
+          "rows": [
+            {
+              "action": "one-user-action",
+              "id": 1
+            },
+            {
+              "action": "one-user-action",
+              "id": 2
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": 6,
+          "startedAt": "2026-11-10T14:56:16.8171241Z",
+          "method": "POST",
+          "path": "/lost",
+          "status": 0,
+          "upstreamStatus": 201,
+          "durationMs": 12.031,
+          "fault": "drop_response",
+          "rule": "drop_response",
+          "outcome": "response_dropped",
+          "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+        },
+        {
+          "id": 7,
+          "startedAt": "2026-11-10T14:56:16.8508039Z",
+          "method": "POST",
+          "path": "/lost",
+          "status": 201,
+          "upstreamStatus": 201,
+          "durationMs": 34.258,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+        }
+      ],
+      "applicationInvariant": {
+        "name": "one record per user action",
+        "passed": false,
+        "actual": 2,
+        "expected": 1,
+        "interpretation": "Expected finding: JSON Server does not deduplicate this POST based on Idempotency-Key."
+      },
+      "passed": true
+    },
+    {
+      "name": "Identical PUT retry preserves one resource",
+      "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3",
+      "checks": [
+        {
+          "name": "First response lost",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Replacement persisted before retry",
+          "actual": 7,
+          "expected": 7,
+          "passed": true
+        },
+        {
+          "name": "Retry status",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Retry leaves same persisted state",
+          "actual": [
+            {
+              "name": "Replaced",
+              "quantity": 7,
+              "id": 1
+            }
+          ],
+          "expected": [
+            {
+              "name": "Replaced",
+              "quantity": 7,
+              "id": 1
+            }
+          ],
+          "passed": true
+        },
+        {
+          "name": "Only one resource exists",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Real response loss recorded",
+          "actual": "response_dropped",
+          "expected": "response_dropped",
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "drop_response",
+            "method": "PUT",
+            "path": "/items/1",
+            "kind": "drop_response",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "persistenceReads": [
+        {
+          "collection": "items",
+          "waitMs": 24.65,
+          "rows": [
+            {
+              "name": "Replaced",
+              "quantity": 7,
+              "id": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": 8,
+          "startedAt": "2026-11-10T14:56:16.9150874Z",
+          "method": "PUT",
+          "path": "/items/1",
+          "status": 0,
+          "upstreamStatus": 200,
+          "durationMs": 34.074,
+          "fault": "drop_response",
+          "rule": "drop_response",
+          "outcome": "response_dropped",
+          "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+        },
+        {
+          "id": 9,
+          "startedAt": "2026-11-10T14:56:16.9776413Z",
+          "method": "PUT",
+          "path": "/items/1",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 43.638,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Two 503s followed by one committed POST",
+      "runId": "939b2f66-eb36-423a-8017-bd209f684714",
+      "checks": [
+        {
+          "name": "Persisted count after attempt 1",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Persisted count after attempt 2",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Persisted count after attempt 3",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "Client status sequence",
+          "actual": [
+            503,
+            503,
+            201
+          ],
+          "expected": [
+            503,
+            503,
+            201
+          ],
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "Injected errors did not reach upstream",
+          "actual": [
+            0,
+            0,
+            201
+          ],
+          "expected": [
+            0,
+            0,
+            201
+          ],
+          "passed": true
+        },
+        {
+          "name": "Fault budget consumed exactly twice",
+          "actual": {
+            "test": 2
+          },
+          "expected": {
+            "test": 2
+          },
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "http_error",
+            "method": "POST",
+            "path": "/errors",
+            "kind": "http_error",
+            "limit": 2,
+            "delayMs": 0,
+            "status": 503,
+            "enabled": true
+          }
+        ]
+      },
+      "persistenceReads": [
+        {
+          "collection": "errors",
+          "waitMs": 2.8,
+          "rows": [
+            {
+              "name": "retry",
+              "id": 1
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "id": 10,
+          "startedAt": "2026-11-10T14:56:17.0610828Z",
+          "method": "POST",
+          "path": "/errors",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 0,
+          "fault": "http_error",
+          "rule": "http_error",
+          "outcome": "error_injected",
+          "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+        },
+        {
+          "id": 11,
+          "startedAt": "2026-11-10T14:56:17.0645671Z",
+          "method": "POST",
+          "path": "/errors",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 0,
+          "fault": "http_error",
+          "rule": "http_error",
+          "outcome": "error_injected",
+          "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+        },
+        {
+          "id": 12,
+          "startedAt": "2026-11-10T14:56:17.0685443Z",
+          "method": "POST",
+          "path": "/errors",
+          "status": 201,
+          "upstreamStatus": 201,
+          "durationMs": 30.295,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Exact method/path matching and query handling",
+      "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de",
+      "checks": [
+        {
+          "name": "Different method passes",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Different path reaches upstream",
+          "actual": 201,
+          "expected": 201,
+          "passed": true
+        },
+        {
+          "name": "Query does not bypass exact path rule",
+          "actual": 503,
+          "expected": 503,
+          "passed": true
+        },
+        {
+          "name": "Rejected POST did not persist",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "Only the exact method/path matched",
+          "actual": [
+            "",
+            "",
+            "http_error"
+          ],
+          "expected": [
+            "",
+            "",
+            "http_error"
+          ],
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "http_error",
+            "method": "POST",
+            "path": "/orders",
+            "kind": "http_error",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 503,
+            "enabled": true
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": 13,
+          "startedAt": "2026-11-10T14:56:17.1761709Z",
+          "method": "GET",
+          "path": "/orders",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 32.248,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+        },
+        {
+          "id": 14,
+          "startedAt": "2026-11-10T14:56:17.2227484Z",
+          "method": "POST",
+          "path": "/orders-near",
+          "status": 201,
+          "upstreamStatus": 201,
+          "durationMs": 17.155,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+        },
+        {
+          "id": 15,
+          "startedAt": "2026-11-10T14:56:17.2440462Z",
+          "method": "POST",
+          "path": "/orders",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 0,
+          "fault": "http_error",
+          "rule": "http_error",
+          "outcome": "error_injected",
+          "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Injected latency is observable and bounded by budget",
+      "runId": "309da8af-816c-46b1-affa-f30e46887117",
+      "checks": [
+        {
+          "name": "Both reads succeeded",
+          "actual": [
+            200,
+            200
+          ],
+          "expected": [
+            200,
+            200
+          ],
+          "passed": true
+        },
+        {
+          "name": "Client observed at least 650 ms",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 2,
+          "expected": 2,
+          "passed": true
+        },
+        {
+          "name": "Only first request delayed",
+          "actual": [
+            "latency",
+            ""
+          ],
+          "expected": [
+            "latency",
+            ""
+          ],
+          "passed": true
+        },
+        {
+          "name": "Proxy recorded delay",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "latency",
+            "method": "GET",
+            "path": "/posts",
+            "kind": "latency",
+            "limit": 1,
+            "delayMs": 700,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "observedClientMs": 776.39,
+      "events": [
+        {
+          "id": 16,
+          "startedAt": "2026-11-10T14:56:17.2885909Z",
+          "method": "GET",
+          "path": "/posts",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 737.454,
+          "fault": "latency",
+          "rule": "latency",
+          "outcome": "forwarded",
+          "runId": "309da8af-816c-46b1-affa-f30e46887117"
+        },
+        {
+          "id": 17,
+          "startedAt": "2026-11-10T14:56:18.0841964Z",
+          "method": "GET",
+          "path": "/posts",
+          "status": 200,
+          "upstreamStatus": 200,
+          "durationMs": 32.847,
+          "fault": "",
+          "rule": "",
+          "outcome": "forwarded",
+          "runId": "309da8af-816c-46b1-affa-f30e46887117"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Client cancellation during latency prevents forwarding",
+      "runId": "71cba061-6fc1-4039-b179-12d33f65e9f1",
+      "checks": [
+        {
+          "name": "Client timed out before injected delay ended",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        },
+        {
+          "name": "No later write after delay expired",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "Cancellation recorded",
+          "actual": "client_cancelled",
+          "expected": "client_cancelled",
+          "passed": true
+        },
+        {
+          "name": "Request never reached upstream",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "Cancelled admission still consumed budget",
+          "actual": {
+            "test": 1
+          },
+          "expected": {
+            "test": 1
+          },
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "latency",
+            "method": "POST",
+            "path": "/cancelled",
+            "kind": "latency",
+            "limit": 1,
+            "delayMs": 1000,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": 18,
+          "startedAt": "2026-11-10T14:56:18.1459341Z",
+          "method": "POST",
+          "path": "/cancelled",
+          "status": 0,
+          "upstreamStatus": 0,
+          "durationMs": 154.741,
+          "fault": "latency",
+          "rule": "latency",
+          "outcome": "client_cancelled",
+          "runId": "71cba061-6fc1-4039-b179-12d33f65e9f1"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "External-target controls and invalid configuration",
+      "runId": "0faae401-4463-4248-b32a-f70c6c365b19",
+      "checks": [
+        {
+          "name": "Invalid configuration rejected",
+          "actual": 400,
+          "expected": 400,
+          "passed": true
+        },
+        {
+          "name": "Valid configuration preserved",
+          "actual": {
+            "version": 1,
+            "name": "JSON Server compatibility",
+            "description": "Independent third-party API",
+            "rules": [
+              {
+                "id": "test",
+                "name": "http_error",
+                "method": "POST",
+                "path": "/orders",
+                "kind": "http_error",
+                "limit": 1,
+                "delayMs": 0,
+                "status": 503,
+                "enabled": true
+              }
+            ]
+          },
+          "expected": {
+            "version": 1,
+            "name": "JSON Server compatibility",
+            "description": "Independent third-party API",
+            "rules": [
+              {
+                "id": "test",
+                "name": "http_error",
+                "method": "POST",
+                "path": "/orders",
+                "kind": "http_error",
+                "limit": 1,
+                "delayMs": 0,
+                "status": 503,
+                "enabled": true
+              }
+            ]
+          },
+          "passed": true
+        },
+        {
+          "name": "Bundled demo marked unavailable",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "Bundled demo cannot write to external target",
+          "actual": 409,
+          "expected": 409,
+          "passed": true
+        },
+        {
+          "name": "Preserved rule still fires",
+          "actual": 503,
+          "expected": 503,
+          "passed": true
+        },
+        {
+          "name": "Every attempt has a proxy event",
+          "actual": 1,
+          "expected": 1,
+          "passed": true
+        }
+      ],
+      "scenario": {
+        "version": 1,
+        "name": "JSON Server compatibility",
+        "description": "Independent third-party API",
+        "rules": [
+          {
+            "id": "test",
+            "name": "http_error",
+            "method": "POST",
+            "path": "/orders",
+            "kind": "http_error",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 503,
+            "enabled": true
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": 19,
+          "startedAt": "2026-11-10T14:56:19.5051161Z",
+          "method": "POST",
+          "path": "/orders",
+          "status": 503,
+          "upstreamStatus": 0,
+          "durationMs": 0,
+          "fault": "http_error",
+          "rule": "http_error",
+          "outcome": "error_injected",
+          "runId": "0faae401-4463-4248-b32a-f70c6c365b19"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "name": "Proxy restart retains external history and resets budgets",
+      "checks": [
+        {
+          "name": "Exact event history survives restart",
+          "actual": [
+            {
+              "id": 19,
+              "startedAt": "2026-11-10T14:56:19.5051161Z",
+              "method": "POST",
+              "path": "/orders",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "0faae401-4463-4248-b32a-f70c6c365b19"
+            },
+            {
+              "id": 18,
+              "startedAt": "2026-11-10T14:56:18.1459341Z",
+              "method": "POST",
+              "path": "/cancelled",
+              "status": 0,
+              "upstreamStatus": 0,
+              "durationMs": 154.741,
+              "fault": "latency",
+              "rule": "latency",
+              "outcome": "client_cancelled",
+              "runId": "71cba061-6fc1-4039-b179-12d33f65e9f1"
+            },
+            {
+              "id": 17,
+              "startedAt": "2026-11-10T14:56:18.0841964Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 32.847,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "309da8af-816c-46b1-affa-f30e46887117"
+            },
+            {
+              "id": 16,
+              "startedAt": "2026-11-10T14:56:17.2885909Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 737.454,
+              "fault": "latency",
+              "rule": "latency",
+              "outcome": "forwarded",
+              "runId": "309da8af-816c-46b1-affa-f30e46887117"
+            },
+            {
+              "id": 15,
+              "startedAt": "2026-11-10T14:56:17.2440462Z",
+              "method": "POST",
+              "path": "/orders",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 14,
+              "startedAt": "2026-11-10T14:56:17.2227484Z",
+              "method": "POST",
+              "path": "/orders-near",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 17.155,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 13,
+              "startedAt": "2026-11-10T14:56:17.1761709Z",
+              "method": "GET",
+              "path": "/orders",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 32.248,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 12,
+              "startedAt": "2026-11-10T14:56:17.0685443Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 30.295,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 11,
+              "startedAt": "2026-11-10T14:56:17.0645671Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 10,
+              "startedAt": "2026-11-10T14:56:17.0610828Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 9,
+              "startedAt": "2026-11-10T14:56:16.9776413Z",
+              "method": "PUT",
+              "path": "/items/1",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 43.638,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+            },
+            {
+              "id": 8,
+              "startedAt": "2026-11-10T14:56:16.9150874Z",
+              "method": "PUT",
+              "path": "/items/1",
+              "status": 0,
+              "upstreamStatus": 200,
+              "durationMs": 34.074,
+              "fault": "drop_response",
+              "rule": "drop_response",
+              "outcome": "response_dropped",
+              "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+            },
+            {
+              "id": 7,
+              "startedAt": "2026-11-10T14:56:16.8508039Z",
+              "method": "POST",
+              "path": "/lost",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 34.258,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+            },
+            {
+              "id": 6,
+              "startedAt": "2026-11-10T14:56:16.8171241Z",
+              "method": "POST",
+              "path": "/lost",
+              "status": 0,
+              "upstreamStatus": 201,
+              "durationMs": 12.031,
+              "fault": "drop_response",
+              "rule": "drop_response",
+              "outcome": "response_dropped",
+              "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+            },
+            {
+              "id": 5,
+              "startedAt": "2026-11-10T14:56:16.7639292Z",
+              "method": "DELETE",
+              "path": "/posts/2",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 35.387,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 4,
+              "startedAt": "2026-11-10T14:56:16.7001609Z",
+              "method": "PATCH",
+              "path": "/posts/2",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 18.289,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 3,
+              "startedAt": "2026-11-10T14:56:16.6857139Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 10.629,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 2,
+              "startedAt": "2026-11-10T14:56:16.6560118Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 26.019,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 1,
+              "startedAt": "2026-11-10T14:56:16.5829088Z",
+              "method": "POST",
+              "path": "/posts",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 68.75,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            }
+          ],
+          "expected": [
+            {
+              "id": 19,
+              "startedAt": "2026-11-10T14:56:19.5051161Z",
+              "method": "POST",
+              "path": "/orders",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "0faae401-4463-4248-b32a-f70c6c365b19"
+            },
+            {
+              "id": 18,
+              "startedAt": "2026-11-10T14:56:18.1459341Z",
+              "method": "POST",
+              "path": "/cancelled",
+              "status": 0,
+              "upstreamStatus": 0,
+              "durationMs": 154.741,
+              "fault": "latency",
+              "rule": "latency",
+              "outcome": "client_cancelled",
+              "runId": "71cba061-6fc1-4039-b179-12d33f65e9f1"
+            },
+            {
+              "id": 17,
+              "startedAt": "2026-11-10T14:56:18.0841964Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 32.847,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "309da8af-816c-46b1-affa-f30e46887117"
+            },
+            {
+              "id": 16,
+              "startedAt": "2026-11-10T14:56:17.2885909Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 737.454,
+              "fault": "latency",
+              "rule": "latency",
+              "outcome": "forwarded",
+              "runId": "309da8af-816c-46b1-affa-f30e46887117"
+            },
+            {
+              "id": 15,
+              "startedAt": "2026-11-10T14:56:17.2440462Z",
+              "method": "POST",
+              "path": "/orders",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 14,
+              "startedAt": "2026-11-10T14:56:17.2227484Z",
+              "method": "POST",
+              "path": "/orders-near",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 17.155,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 13,
+              "startedAt": "2026-11-10T14:56:17.1761709Z",
+              "method": "GET",
+              "path": "/orders",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 32.248,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "8cd5a40d-34f2-4240-90b7-ee1d2c3ba3de"
+            },
+            {
+              "id": 12,
+              "startedAt": "2026-11-10T14:56:17.0685443Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 30.295,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 11,
+              "startedAt": "2026-11-10T14:56:17.0645671Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 10,
+              "startedAt": "2026-11-10T14:56:17.0610828Z",
+              "method": "POST",
+              "path": "/errors",
+              "status": 503,
+              "upstreamStatus": 0,
+              "durationMs": 0,
+              "fault": "http_error",
+              "rule": "http_error",
+              "outcome": "error_injected",
+              "runId": "939b2f66-eb36-423a-8017-bd209f684714"
+            },
+            {
+              "id": 9,
+              "startedAt": "2026-11-10T14:56:16.9776413Z",
+              "method": "PUT",
+              "path": "/items/1",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 43.638,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+            },
+            {
+              "id": 8,
+              "startedAt": "2026-11-10T14:56:16.9150874Z",
+              "method": "PUT",
+              "path": "/items/1",
+              "status": 0,
+              "upstreamStatus": 200,
+              "durationMs": 34.074,
+              "fault": "drop_response",
+              "rule": "drop_response",
+              "outcome": "response_dropped",
+              "runId": "dc1ec7a1-daa3-462d-9dd5-c493c48a8da3"
+            },
+            {
+              "id": 7,
+              "startedAt": "2026-11-10T14:56:16.8508039Z",
+              "method": "POST",
+              "path": "/lost",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 34.258,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+            },
+            {
+              "id": 6,
+              "startedAt": "2026-11-10T14:56:16.8171241Z",
+              "method": "POST",
+              "path": "/lost",
+              "status": 0,
+              "upstreamStatus": 201,
+              "durationMs": 12.031,
+              "fault": "drop_response",
+              "rule": "drop_response",
+              "outcome": "response_dropped",
+              "runId": "e19829e8-ff13-424a-8c2b-0e8e22376ad8"
+            },
+            {
+              "id": 5,
+              "startedAt": "2026-11-10T14:56:16.7639292Z",
+              "method": "DELETE",
+              "path": "/posts/2",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 35.387,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 4,
+              "startedAt": "2026-11-10T14:56:16.7001609Z",
+              "method": "PATCH",
+              "path": "/posts/2",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 18.289,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 3,
+              "startedAt": "2026-11-10T14:56:16.6857139Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 10.629,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 2,
+              "startedAt": "2026-11-10T14:56:16.6560118Z",
+              "method": "GET",
+              "path": "/posts",
+              "status": 200,
+              "upstreamStatus": 200,
+              "durationMs": 26.019,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            },
+            {
+              "id": 1,
+              "startedAt": "2026-11-10T14:56:16.5829088Z",
+              "method": "POST",
+              "path": "/posts",
+              "status": 201,
+              "upstreamStatus": 201,
+              "durationMs": 68.75,
+              "fault": "",
+              "rule": "",
+              "outcome": "forwarded",
+              "runId": "3a0699b4-eaa0-4849-8a0a-3dc23964cd39"
+            }
+          ],
+          "passed": true
+        },
+        {
+          "name": "Scenario survives restart",
+          "actual": {
+            "version": 1,
+            "name": "JSON Server compatibility",
+            "description": "Independent third-party API",
+            "rules": [
+              {
+                "id": "test",
+                "name": "http_error",
+                "method": "POST",
+                "path": "/orders",
+                "kind": "http_error",
+                "limit": 1,
+                "delayMs": 0,
+                "status": 503,
+                "enabled": true
+              }
+            ]
+          },
+          "expected": {
+            "version": 1,
+            "name": "JSON Server compatibility",
+            "description": "Independent third-party API",
+            "rules": [
+              {
+                "id": "test",
+                "name": "http_error",
+                "method": "POST",
+                "path": "/orders",
+                "kind": "http_error",
+                "limit": 1,
+                "delayMs": 0,
+                "status": 503,
+                "enabled": true
+              }
+            ]
+          },
+          "passed": true
+        },
+        {
+          "name": "Fault budgets reset",
+          "actual": {},
+          "expected": {},
+          "passed": true
+        },
+        {
+          "name": "External target remains external",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "project": "https://github.com/typicode/json-server",
+  "targetVersion": "0.17.4",
+  "binaryVersion": "Blackbox 0.3.0",
+  "binarySha256": "06d494b5807a83ed03785963222c932fbe5c0a43ee7a7fdd048c156bf7eb79de",
+  "dependencyLockSha256": "464a4e847b1fc68527e10c53d63cdb489c416d95508f4e350a031dc6fb316498",
+  "browserChecks": [
+    {
+      "viewport": "desktop",
+      "passed": true,
+      "checks": [
+        "external target explanation",
+        "demo disabled",
+        "real lost-response event inspectable",
+        "no horizontal page overflow",
+        "no JavaScript errors"
+      ]
+    },
+    {
+      "viewport": "mobile",
+      "passed": true,
+      "checks": [
+        "external target explanation",
+        "demo disabled",
+        "real lost-response event inspectable",
+        "no horizontal page overflow",
+        "no JavaScript errors"
+      ]
+    }
+  ],
+  "cleanupCompleted": true
+}

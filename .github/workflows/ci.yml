@@ -72,6 +72,21 @@ jobs:
       - name: Install browser
         working-directory: web
         run: npx playwright install --with-deps chromium
+      - name: Install independent JSON Server fixture
+        run: npm ci --prefix integrations/json-server --ignore-scripts --no-audit --no-fund
+      - name: Verify independent JSON Server compatibility
+        run: python integrations/json-server/check.py --blackbox dist/blackbox --out .blackbox/json-server-results
+      - name: Upload independent compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-server-compatibility-evidence
+          include-hidden-files: true
+          path: |
+            .blackbox/json-server-results/report.json
+            .blackbox/json-server-results/report.md
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Browser integration tests
         working-directory: web
         run: npm run test:e2e

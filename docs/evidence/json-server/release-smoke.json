@@ -1,0 +1,98 @@
+{
+  "startedAt": "2026-11-10T14:59:53.704866+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Published archive matches GitHub asset digest",
+      "actual": "57d9f2e83fa8a1d1f1cf21da36801c3828f69d6f62ea2e34fdc30e2aeebfb582",
+      "expected": "57d9f2e83fa8a1d1f1cf21da36801c3828f69d6f62ea2e34fdc30e2aeebfb582",
+      "passed": true
+    },
+    {
+      "name": "Downloaded checksum matches archive",
+      "actual": "57d9f2e83fa8a1d1f1cf21da36801c3828f69d6f62ea2e34fdc30e2aeebfb582",
+      "expected": "57d9f2e83fa8a1d1f1cf21da36801c3828f69d6f62ea2e34fdc30e2aeebfb582",
+      "passed": true
+    },
+    {
+      "name": "Packaged launcher starts bundled API",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "Console served",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "Embedded JavaScript and CSS referenced",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "Embedded asset served: /assets/index-CnifNUOW.js",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "Embedded asset served: /assets/index--uA9vGIt.css",
+      "actual": 200,
+      "expected": 200,
+      "passed": true
+    },
+    {
+      "name": "fragile CLI exit code",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "name": "fragile stored-workout count",
+      "actual": 2,
+      "expected": 2,
+      "passed": true
+    },
+    {
+      "name": "resilient CLI exit code",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "name": "resilient stored-workout count",
+      "actual": 1,
+      "expected": 1,
+      "passed": true
+    },
+    {
+      "name": "CLI export succeeds",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "name": "CLI export contains saved rules",
+      "actual": "drop_response",
+      "expected": "drop_response",
+      "passed": true
+    },
+    {
+      "name": "Owned launcher process tree stopped",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "name": "Console port closed after cleanup",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    }
+  ],
+  "source": "https://github.com/nerifilipe/blackbox/releases/tag/v0.3.0",
+  "archiveSha256": "57d9f2e83fa8a1d1f1cf21da36801c3828f69d6f62ea2e34fdc30e2aeebfb582"
+}

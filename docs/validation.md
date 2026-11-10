@@ -87,4 +87,12 @@ Additional checks:
 
 Environment notes: the sandbox's Windows certificate-store handling stalled pip during bootstrap. Setup completed using pip's `legacy-certs` option; certificate verification remained enabled. Git's OpenSSL backend was used for the sandbox checkout. Neither override changes the shipped defaults. As in earlier revisions, completed Playwright runs required explicit shutdown of their isolated server before the Windows runner exited.
 
-Docker Compose and Linux GitHub Actions are configured but were not run locally: Docker Desktop's daemon was unavailable. The new workflow will execute after the owner pushes v0.3. The successful remote v0.2 run does not validate these newer changes. No mobile app, production database or remote user data was involved.
+Docker Compose was not run locally because Docker Desktop's daemon was unavailable. After publication, [GitHub Actions run 42082208879](https://github.com/nerifilipe/blackbox/actions/runs/42082208879) passed for v0.3. No mobile app, production database or remote user data was involved.
+
+## Independent project check — 2026-11-10
+
+The published v0.3.0 Windows archive was downloaded, checksum-verified and tested against unmodified typicode/JSON Server 0.17.4. Nine external API scenarios passed 62 assertions, plus five browser checks at each of two viewports. The batch launcher, embedded assets, CLI behavior and cleanup passed 15 additional checks in a directory containing spaces with development tools removed from the child PATH.
+
+The main finding was a duplicate POST after a lost response despite a repeated Idempotency-Key header: the target does not implement that deduplication behavior. The tool correctly exposed the failed application invariant. An identical PUT preserved one resource's final state. No Blackbox source change was needed for these results.
+
+See [the report, evidence and limitations](third-party-validation.md). The independent fixture and CI steps are new local changes; the earlier successful v0.3 workflow predates them.

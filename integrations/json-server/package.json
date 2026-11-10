@@ -1,0 +1,9 @@
+{
+  "name": "blackbox-json-server-verification",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Independent compatibility tests against typicode/json-server, without modifying its code.",
+  "dependencies": {
+    "json-server": "0.17.4"
+  }
+}

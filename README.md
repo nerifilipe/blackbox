@@ -8,6 +8,8 @@ Built with **Go · React · TypeScript · SQLite**. The compiled application emb
 
 **New in v0.3:** reproduce three failures against the real Fitness Tracker backend and PostgreSQL: a lost response after commit, temporary 503s and concurrent edits. [Read the case study](docs/fitness-case-study.md), [inspect recorded evidence](docs/evidence/fitness/report.json), or [run it yourself](integrations/fitness/README.md).
 
+**Independent compatibility check:** the published Windows release also passed nine scenarios and 62 assertions against the unmodified third-party JSON Server API. The tests exposed duplicate POST records after a lost response, including when the client repeated an idempotency header. [Results and scope](docs/third-party-validation.md) · [Reproduce](integrations/json-server/README.md).
+
 ![Blackbox failure lab showing a successful idempotency experiment](docs/images/desktop.png)
 
 ## The experiment
