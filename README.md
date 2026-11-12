@@ -52,7 +52,9 @@ sh scripts/build.sh
 ./dist/blackbox serve
 ```
 
-Once built, Blackbox runs as a single executable without Go or Node installed. For a prebuilt Windows package, check [Releases](https://github.com/nerifilipe/blackbox/releases). Download v0.4.0 or newer for the interface shown here, extract the ZIP and run `Start-Blackbox.cmd`.
+Once built, Blackbox runs as a single executable without Go or Node installed.
+
+**Windows download:** get the ZIP from [Releases](https://github.com/nerifilipe/blackbox/releases), extract it and run `Start-Blackbox.cmd`.
 
 ## Try your first experiment
 
