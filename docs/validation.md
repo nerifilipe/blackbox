@@ -96,3 +96,14 @@ The published v0.3.0 Windows archive was downloaded, checksum-verified and teste
 The main finding was a duplicate POST after a lost response despite a repeated Idempotency-Key header: the target does not implement that deduplication behavior. The tool correctly exposed the failed application invariant. An identical PUT preserved one resource's final state. No Blackbox source change was needed for these results.
 
 See [the report, evidence and limitations](third-party-validation.md). The independent fixture and CI steps are new local changes; the earlier successful v0.3 workflow predates them.
+
+
+## Console redesign — 2026-11-11
+
+Replaced the previous console layout and styling, rebuilt the embedded frontend and executable, and verified the new interface. Backend tests and vet passed. All 26 browser cases passed across the full suite and targeted keyboard/navigation reruns; the report preserves which execution each result came from. The independent JSON Server integration passed 9 scenarios / 62 assertions, plus desktop/mobile UI checks.
+
+Added a 73.72-second 1080p MP4 walkthrough, a WebM version, a thumbnail extracted from the MP4, a recording script and a revised README. The MP4 decoded completely and played/seeks correctly in Chrome.
+
+[Detailed scope, fixes and evidence](interface-redesign.md) · [Video](portfolio-video.md).
+
+These changes remain local. No new CI result or release is claimed. The earlier published v0.3.0 archive still contains the previous interface.

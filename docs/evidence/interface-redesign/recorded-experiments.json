@@ -1,0 +1,139 @@
+{
+  "runs": [
+    {
+      "id": "baa9dfe528efdbb17a1c957d0de211ba",
+      "startedAt": "2026-11-11T19:42:30.7159186Z",
+      "mode": "resilient",
+      "scenario": "The lost response",
+      "scenarioSnapshot": {
+        "version": 1,
+        "name": "The lost response",
+        "description": "The server saves the workout. The response never arrives. Is a retry safe?",
+        "rules": [
+          {
+            "id": "lost-response",
+            "name": "Drop the first response",
+            "method": "POST",
+            "path": "/workouts",
+            "kind": "drop_response",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "fixture": "workout-v1",
+      "attempts": [
+        {
+          "number": 1,
+          "status": 0,
+          "outcome": "connection_lost"
+        },
+        {
+          "number": 2,
+          "status": 200,
+          "outcome": "received"
+        }
+      ],
+      "storedWorkouts": 1,
+      "passed": true,
+      "durationMs": 217
+    },
+    {
+      "id": "8e13c49257548eb389d3197ee7814e51",
+      "startedAt": "2026-11-11T19:42:07.3912536Z",
+      "mode": "fragile",
+      "scenario": "The lost response",
+      "scenarioSnapshot": {
+        "version": 1,
+        "name": "The lost response",
+        "description": "The server saves the workout. The response never arrives. Is a retry safe?",
+        "rules": [
+          {
+            "id": "lost-response",
+            "name": "Drop the first response",
+            "method": "POST",
+            "path": "/workouts",
+            "kind": "drop_response",
+            "limit": 1,
+            "delayMs": 0,
+            "status": 0,
+            "enabled": true
+          }
+        ]
+      },
+      "fixture": "workout-v1",
+      "attempts": [
+        {
+          "number": 1,
+          "status": 0,
+          "outcome": "connection_lost"
+        },
+        {
+          "number": 2,
+          "status": 201,
+          "outcome": "received"
+        }
+      ],
+      "storedWorkouts": 2,
+      "passed": false,
+      "durationMs": 316
+    }
+  ],
+  "events": [
+    {
+      "id": 4,
+      "startedAt": "2026-11-11T19:42:30.8992441Z",
+      "method": "POST",
+      "path": "/workouts",
+      "status": 200,
+      "upstreamStatus": 200,
+      "durationMs": 29.354,
+      "fault": "",
+      "rule": "",
+      "outcome": "forwarded",
+      "runId": "baa9dfe528efdbb17a1c957d0de211ba"
+    },
+    {
+      "id": 3,
+      "startedAt": "2026-11-11T19:42:30.7222184Z",
+      "method": "POST",
+      "path": "/workouts",
+      "status": 0,
+      "upstreamStatus": 201,
+      "durationMs": 7.269,
+      "fault": "drop_response",
+      "rule": "Drop the first response",
+      "outcome": "response_dropped",
+      "runId": "baa9dfe528efdbb17a1c957d0de211ba"
+    },
+    {
+      "id": 2,
+      "startedAt": "2026-11-11T19:42:07.6859725Z",
+      "method": "POST",
+      "path": "/workouts",
+      "status": 201,
+      "upstreamStatus": 201,
+      "durationMs": 17.672,
+      "fault": "",
+      "rule": "",
+      "outcome": "forwarded",
+      "runId": "8e13c49257548eb389d3197ee7814e51"
+    },
+    {
+      "id": 1,
+      "startedAt": "2026-11-11T19:42:07.4209548Z",
+      "method": "POST",
+      "path": "/workouts",
+      "status": 0,
+      "upstreamStatus": 201,
+      "durationMs": 28.048,
+      "fault": "drop_response",
+      "rule": "Drop the first response",
+      "outcome": "response_dropped",
+      "runId": "8e13c49257548eb389d3197ee7814e51"
+    }
+  ],
+  "errors": []
+}

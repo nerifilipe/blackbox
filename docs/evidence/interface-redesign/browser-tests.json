@@ -1,0 +1,226 @@
+{
+  "date": "2026-11-11",
+  "passed": true,
+  "total": 26,
+  "note": "24 cases passed in the last full suite. Both keyboard cases passed after the accessible-name fix. Both history cases passed again after the scroll-restoration fix. 26 distinct cases passed; no remaining failures.",
+  "iterations": [
+    {
+      "file": "ui-redesign-tests.json",
+      "stats": {
+        "startTime": "2026-11-11T19:41:37.508Z",
+        "duration": 106991.31999999999,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      }
+    },
+    {
+      "file": "ui-redesign-keyboard.json",
+      "stats": {
+        "startTime": "2026-11-11T19:45:25.118Z",
+        "duration": 17406.757,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "file": "ui-redesign-navigation.json",
+      "stats": {
+        "startTime": "2026-11-11T19:49:38.102Z",
+        "duration": 25981.388000000003,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "offline fitness evidence expands and downloads without external resources",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 1442,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "evidence walkthrough advances, pauses and closes",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 2203,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "offline fitness evidence expands and downloads without external resources",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 1732,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "evidence walkthrough advances, pauses and closes",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 1902,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "real lost response: unsafe retries duplicate, idempotent retries recover",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 3060,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "503 scenario retries exactly twice before succeeding",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 3127,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "import, validate, export and re-arm a custom scenario",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 2735,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "navigation, filters and narrow viewport avoid page overflow",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 2343,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "history compares real runs, restores the saved rules and survives reload",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 3086,
+      "source": "ui-redesign-navigation.json"
+    },
+    {
+      "name": "comparison flags different rules with the same name and handles legacy runs",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 2430,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "history distinguishes an unavailable database from an empty history",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 1600,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "keyboard can configure a run and dismiss dialogs back to the trigger",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 2704,
+      "source": "ui-redesign-keyboard.json"
+    },
+    {
+      "name": "loss of connection disables mutations and reconnects without losing the selected client",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 3921,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "320px viewport keeps long request paths and the inspector within the page",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 1352,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "reduced motion and external targets retain a usable, correctly labelled interface",
+      "viewport": "desktop",
+      "status": "passed",
+      "durationMs": 1703,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "real lost response: unsafe retries duplicate, idempotent retries recover",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2929,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "503 scenario retries exactly twice before succeeding",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2677,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "import, validate, export and re-arm a custom scenario",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 3186,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "navigation, filters and narrow viewport avoid page overflow",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2125,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "history compares real runs, restores the saved rules and survives reload",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2983,
+      "source": "ui-redesign-navigation.json"
+    },
+    {
+      "name": "comparison flags different rules with the same name and handles legacy runs",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2807,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "history distinguishes an unavailable database from an empty history",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 1947,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "keyboard can configure a run and dismiss dialogs back to the trigger",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2066,
+      "source": "ui-redesign-keyboard.json"
+    },
+    {
+      "name": "loss of connection disables mutations and reconnects without losing the selected client",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 3637,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "320px viewport keeps long request paths and the inspector within the page",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 1494,
+      "source": "ui-redesign-tests.json"
+    },
+    {
+      "name": "reduced motion and external targets retain a usable, correctly labelled interface",
+      "viewport": "mobile",
+      "status": "passed",
+      "durationMs": 2276,
+      "source": "ui-redesign-tests.json"
+    }
+  ],
+  "finalExecutableSha256": "fc6728f331dd5723c009b42c183acb43fba900b812c709a1aea61fbea80b1e93"
+}

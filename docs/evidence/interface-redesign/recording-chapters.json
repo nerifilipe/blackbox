@@ -1,0 +1,38 @@
+[
+  {
+    "seconds": 6.468,
+    "number": 1,
+    "title": "Choose a failure.",
+    "caption": "Drop the first response after the API has already saved the workout."
+  },
+  {
+    "seconds": 14.577,
+    "number": 2,
+    "title": "One action. Two writes.",
+    "caption": "The unprotected client stores two workouts. The invariant is broken."
+  },
+  {
+    "seconds": 23.371,
+    "number": 3,
+    "title": "Find the missing link.",
+    "caption": "The server answered. Blackbox dropped that response before the client received it."
+  },
+  {
+    "seconds": 33.83,
+    "number": 4,
+    "title": "Change the retry behavior.",
+    "caption": "Reuse an idempotency key, with an API that implements deduplication."
+  },
+  {
+    "seconds": 45.466,
+    "number": 5,
+    "title": "Compare the evidence.",
+    "caption": "Both runs retain their fault rules. The comparison checks that the setups match."
+  },
+  {
+    "seconds": 59.907,
+    "number": 6,
+    "title": "Keep the case close.",
+    "caption": "Inspect outcomes, restore a setup, and run it again. All on your machine."
+  }
+]

@@ -15,7 +15,7 @@ test.beforeEach(async ({ request }) => {
 test('real lost response: unsafe retries duplicate, idempotent retries recover', async ({ page }, info) => {
  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
  await page.goto('/');
- await expect(page.getByRole('heading', { name: 'Make failure repeatable.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Failure lab' })).toBeVisible();
  await page.getByRole('button', { name: 'Run experiment', exact: true }).click();
  await expect(page.getByText('One action. Duplicate writes.')).toBeVisible();
  await expect(page.getByText('actual: 2', { exact: true })).toBeVisible();
@@ -73,13 +73,13 @@ test('import, validate, export and re-arm a custom scenario', async ({ page }) =
 test('navigation, filters and narrow viewport avoid page overflow', async ({ page }) => {
  await page.goto('/');
  await page.getByRole('button', { name: /Request stream/ }).click();
- await expect(page.getByRole('heading', { name: 'Every request. In focus.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Request stream', exact: true })).toBeVisible();
  await page.getByRole('textbox', { name: 'Filter requests' }).fill('no-such-path');
- await expect(page.getByText(/No matching requests|Your next request starts the story/)).toBeVisible();
+ await expect(page.getByText(/No matching requests|No requests yet/)).toBeVisible();
  await page.getByRole('button', { name: /Field guide/ }).click();
- await expect(page.getByRole('heading', { name: 'Learn from the breakage.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Field guide' })).toBeVisible();
  await page.getByRole('button', { name: 'Open failure lab' }).click();
- await expect(page.getByRole('heading', { name: 'Make failure repeatable.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Failure lab' })).toBeVisible();
  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 });
 
@@ -92,7 +92,7 @@ test('history compares real runs, restores the saved rules and survives reload',
  const resilient = await resilientResponse.json();
  await page.goto('/');
  await page.getByRole('button', { name: 'Experiments', exact: true }).click();
- await expect(page.getByRole('heading', { name: 'Before. After. Understood.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Experiments', exact: true })).toBeVisible();
  await page.getByRole('combobox', { name: 'Baseline experiment', exact: true }).selectOption(fragile.id);
  await page.getByRole('combobox', { name: 'Comparison experiment', exact: true }).selectOption(resilient.id);
  await expect(page.getByText('The invariant recovered.', { exact: true })).toBeVisible();
@@ -113,7 +113,7 @@ test('history compares real runs, restores the saved rules and survives reload',
  const edited = { ...scenario, rules: [{ ...scenario.rules[0], kind: 'latency', delayMs: 50 }] };
  expect((await request.put('/api/scenario', { data: edited })).ok()).toBeTruthy();
  await page.getByRole('article', { name: 'Comparison experiment' }).getByRole('button', { name: 'Restore setup' }).click();
- await expect(page.getByRole('heading', { name: 'Make failure repeatable.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'Failure lab' })).toBeInViewport();
  await expect(page.getByRole('button', { name: 'Idempotent', exact: true })).toHaveAttribute('aria-pressed', 'true');
  const active = await request.get('/api/scenario');
  expect((await active.json()).rules[0].kind).toBe('drop_response');
@@ -148,9 +148,83 @@ test('history distinguishes an unavailable database from an empty history', asyn
  await page.goto('/');
  await page.getByRole('button', { name: 'Experiments', exact: true }).click();
  await expect(page.getByRole('heading', { name: 'History is unavailable.' })).toBeVisible();
- await expect(page.getByText('Your experiments belong here.', { exact: true })).not.toBeVisible();
+ await expect(page.getByText('No saved experiments yet.', { exact: true })).not.toBeVisible();
  unavailable = false;
  await page.getByRole('button', { name: 'Refresh history' }).click();
- await expect(page.getByRole('heading', { name: 'Your experiments belong here.' })).toBeVisible();
+ await expect(page.getByRole('heading', { name: 'No saved experiments yet.' })).toBeVisible();
  await expect(page.getByRole('alert')).not.toBeVisible();
+});
+
+
+test('keyboard can configure a run and dismiss dialogs back to the trigger', async ({ page }) => {
+ await page.goto('/');
+ const editor = page.getByRole('button', { name: 'Edit scenario', exact: true });
+ await editor.focus();
+ await page.keyboard.press('Enter');
+ await expect(page.getByRole('dialog', { name: 'Edit fault rules' })).toBeVisible();
+ // Start in the editable JSON; reverse tab reaches the dialog's close button.
+ await expect(page.getByRole('textbox', { name: 'Scenario JSON' })).toBeFocused();
+ await page.keyboard.press('Shift+Tab');
+ expect(await page.evaluate(() => document.activeElement?.closest('dialog') !== null)).toBeTruthy();
+ await page.keyboard.press('Escape');
+ await expect(editor).toBeFocused();
+ const resilient = page.getByRole('button', { name: 'Idempotent', exact: true });
+ await resilient.focus();
+ await page.keyboard.press('Space');
+ await expect(resilient).toHaveAttribute('aria-pressed', 'true');
+ await page.getByRole('button', { name: 'Run experiment', exact: true }).focus();
+ await page.keyboard.press('Enter');
+ await expect(page.getByText('actual: 1', { exact: true })).toBeVisible();
+ const event = page.getByRole('button', { name: 'Inspect POST /workouts, connection dropped' }).first();
+ await event.focus();
+ await page.keyboard.press('Enter');
+ await expect(page.getByRole('dialog', { name: 'POST /workouts' })).toBeVisible();
+ await page.keyboard.press('Escape');
+ await expect(event).toBeFocused();
+});
+
+test('loss of connection disables mutations and reconnects without losing the selected client', async ({ page }) => {
+ await page.goto('/');
+ await page.getByRole('button', { name: 'Idempotent', exact: true }).click();
+ await page.route('**/api/state', route => route.abort());
+ await expect(page.getByRole('alert')).toContainText('Connection lost');
+ await expect(page.getByRole('button', { name: 'Run experiment', exact: true })).toBeDisabled();
+ await expect(page.getByRole('button', { name: 'Edit scenario', exact: true })).toBeDisabled();
+ await expect(page.getByRole('button', { name: /The slow lane/ })).toBeDisabled();
+ await page.unroute('**/api/state');
+ await expect(page.getByRole('alert')).not.toBeVisible();
+ await expect(page.getByRole('button', { name: 'Run experiment', exact: true })).toBeEnabled();
+ await expect(page.getByRole('button', { name: 'Idempotent', exact: true })).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('320px viewport keeps long request paths and the inspector within the page', async ({ page, request }) => {
+ const response = await request.get('/api/state');
+ const state = await response.json();
+ const path = '/external/' + 'long-resource-name-'.repeat(20);
+ const event = { id: 9001, startedAt: new Date().toISOString(), method: 'POST', path, status: 0, upstreamStatus: 201, durationMs: 12, fault: 'drop_response', rule: 'long-rule', outcome: 'response_dropped', runId: '' };
+ await page.route('**/api/state', route => route.fulfill({ json: { ...state, events: [event] } }));
+ await page.setViewportSize({ width: 320, height: 800 });
+ await page.goto('/');
+ expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+ await page.getByRole('navigation').getByRole('button', { name: /Request stream/ }).click();
+ await page.getByRole('button', { name: `Inspect POST ${path}, connection dropped` }).click();
+ await expect(page.getByRole('dialog')).toContainText('No HTTP response');
+ expect(await page.getByRole('dialog').evaluate(el => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+ expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+});
+
+test('reduced motion and external targets retain a usable, correctly labelled interface', async ({ page, request }) => {
+ const state = await (await request.get('/api/state')).json();
+ await page.route('**/api/state', route => route.fulfill({ json: { ...state, demoAvailable: false, lastRun: null } }));
+ await page.emulateMedia({ reducedMotion: 'reduce' });
+ await page.goto('/');
+ await expect(page.getByRole('button', { name: 'Run experiment', exact: true })).toBeDisabled();
+ await expect(page.getByRole('button', { name: 'Idempotent', exact: true })).not.toBeVisible();
+ await expect(page.getByText('Your API. Your experiment.', { exact: true })).toBeVisible();
+ await page.getByRole('button', { name: 'Edit scenario', exact: true }).click();
+ await expect(page.getByRole('dialog', { name: 'Edit fault rules' })).toBeVisible();
+ await page.keyboard.press('Escape');
+ await page.getByRole('navigation').getByRole('button', { name: 'Field guide', exact: true }).click();
+ await expect(page.getByRole('navigation').getByRole('button', { name: 'Field guide', exact: true })).toHaveAttribute('aria-current','page');
+ await expect(page.getByRole('heading', { name: 'Connect your own API' })).toBeVisible();
 });
