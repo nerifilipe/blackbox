@@ -40,7 +40,7 @@ func execute(args []string) error {
 	case "run", "export":
 		return clientCommand(command, args)
 	case "version":
-		fmt.Println("Blackbox 0.3.0")
+		fmt.Println("Blackbox 0.4.0")
 		return nil
 	default:
 		return fmt.Errorf("unknown command %q; use serve, run, export or version", command)
